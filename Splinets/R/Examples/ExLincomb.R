@@ -1,0 +1,121 @@
+#-------------------------------------------------------------#
+#------------Simple linear operations on Splinets-------------#
+#-------------------------------------------------------------#
+#Gathering three 'Splinets' objects 
+n=53; k=4; xi=sort(runif(n+2)); xi[1]=0; xi[n+2]=1;Nspl=10
+set.seed(5)
+S=matrix(rnorm((n+2)*(k+1)),ncol=(k+1))
+spl=construct(xi,k,S) #constructing the first proper spline
+spl@epsilon=1.0e-5 #to avoid FALSE in the next function due to inaccuracies
+is.splinets(spl)
+
+RS=rspline(spl,Nspl) #Random splines
+plot(RS)
+A = matrix(rnorm(5*Nspl, mean = 2, sd = 100), ncol = Nspl)
+
+new_sp1 = lincomb(RS, A)
+plot(new_sp1)
+
+new_sp2 = lincomb(RS, A, reduced = FALSE)
+plot(new_sp2)
+
+#---------------------------------------------#
+#--- Example with different support ranges ---#
+#---------------------------------------------#
+n=25; k=3
+set.seed(5)
+xi=sort(runif(n+2)); xi[1]=0; xi[n+2]=1
+#Defining support ranges for three splines
+supp=matrix(c(2,12,4,20,6,25),byrow=TRUE,ncol=2)
+#Initial random matrices of the derivative for each spline
+SS1=matrix(rnorm((supp[1,2]-supp[1,1]+1)*(k+1)),ncol=(k+1)) 
+SS2=matrix(rnorm((supp[2,2]-supp[2,1]+1)*(k+1)),ncol=(k+1)) 
+SS3=matrix(rnorm((supp[3,2]-supp[3,1]+1)*(k+1)),ncol=(k+1)) 
+spl=construct(xi,k,SS1,supp[1,]) #constructing the first correct spline
+nspl=construct(xi,k,SS2,supp[2,])
+spl=gather(spl,nspl) #the second and the first ones
+nspl=construct(xi,k,SS3,supp[3,])
+spl=gather(spl,nspl) #the third is added
+
+A = matrix(rnorm(3*2, mean = 2, sd = 100), ncol = 3)
+
+new_sp1 = lincomb(spl, A) # based on reduced supports
+plot(new_sp1)
+new_sp2 = lincomb(spl, A, reduced = FALSE) # based on full support
+plot(new_sp2) # new_sp1 and new_sp2 are same 
+
+#-----------------------------------------#
+#--- Example with varying support sets ---#
+#-----------------------------------------#
+n=40; xi=seq(0,1,by=1/(n+1)); k=2; 
+support=list(matrix(c(2,9,15,24,30,37),ncol=2,byrow = TRUE))
+sp=new("Splinets",knots=xi,smorder=k,supp=support) 
+m=sum(sp@supp[[1]][,2]-sp@supp[[1]][,1]+1) #the number of knots in the support
+sp@der=list(matrix(rnorm(m*(k+1)),ncol=(k+1))) #the derivative matrix at random
+sp1 = is.splinets(sp)[[2]] #the corrected vs. the original 'der' matrices
+
+support=list(matrix(c(5,12,17,29),ncol=2,byrow = TRUE))
+sp=new("Splinets",knots=xi,smorder=k,supp=support) 
+m=sum(sp@supp[[1]][,2]-sp@supp[[1]][,1]+1) #the number of knots in the support
+sp@der=list(matrix(rnorm(m*(k+1)),ncol=(k+1))) #the derivative matrix at random
+sp2 = is.splinets(sp)[[2]] #building a valid spline
+
+spp = gather(sp1,sp2)
+
+support=list(matrix(c(3,10,14,21,27,34),ncol=2,byrow = TRUE))
+sp=new("Splinets",knots=xi,smorder=k,supp=support) 
+m=sum(sp@supp[[1]][,2]-sp@supp[[1]][,1]+1) #the number of knots in the support
+sp@der=list(matrix(rnorm(m*(k+1)),ncol=(k+1))) #the derivative matrix at random
+sp3 = is.splinets(sp)[[2]] #building a valid spline
+
+spp = gather(spp, sp3)
+
+plot(spp)
+spp@supp #the supports
+
+set.seed(5)
+A = matrix(rnorm(3*4, mean = 2, sd = 100), ncol = 3)
+new_sp1 = lincomb(spp, A) # based on reduced supports
+plot(new_sp1)
+new_sp1@supp #the support of the output from 'lincomb'
+
+new_sp2 = lincomb(spp, A, reduced = FALSE) # based on full support
+plot(new_sp2) # new_sp1 and new_sp2 are same 
+new_sp2@supp #the support of the output from 'lincomb' with full support computations
+
+#-------------------------------------#
+#--- Support needs some extra care ---#
+#-------------------------------------#
+set.seed(5)
+n=53; k=4; xi=sort(runif(n+2)); xi[1]=0; xi[n+2]=1
+supp1 = matrix(c(1, ceiling(n/2)+1), ncol = 2)
+supp2 = matrix(c(ceiling(n/2)+1, n+2), ncol = 2)
+S = matrix(rnorm(5*(ceiling(n/2)+1)), ncol = k+1)
+a = construct(xi,k,S,supp = supp1) #constructing the first proper spline
+S = matrix(rnorm(5*(ceiling(n/2)+1)), ncol = k+1)
+b = construct(xi,k,S,supp = supp2) #constructing the first proper spline
+
+sp = gather(a,b)
+plot(sp)
+
+# create a+b and a-b
+s = lincomb(sp, matrix(c(1,1,1,-1), byrow = TRUE, nrow = 2))
+plot(s)
+s@supp
+
+# Sum has smaller support than its terms
+s1 = lincomb(s, matrix(c(1,1), nrow = 1), reduced = TRUE)
+plot(s1)
+s1@supp # lincomb based on support, the full support is reported
+s2 = lincomb(s, matrix(c(1,1), nrow = 1), reduced = FALSE)
+plot(s2) 
+s2@supp # lincomb using full der matrix
+
+s3=lincomb(s, matrix(c(1,1), nrow = 1), reduced = FALSE, SuppExtr=FALSE)
+s3@supp #the full range is reported as support
+
+ES=exsupp(s1@der[[1]]) #correcting the matrix and the support 
+s1@der[[1]]=ES[[1]]   
+s1@supp[[1]]=ES[[2]]
+plot(s1)
+s1@supp[[1]]
