@@ -9,8 +9,9 @@
 #' then it is treated as \code{N} piecewise constant functions with the arguments in the first column and the corresponding values of the functions in the remaining \code{N} columns. 
 #' @param knots vector, the knots of the projection space, together with \code{smorder} fully characterizes the projection space; This parameter is overridden by the SLOT \code{basis@knots} of the \code{basis} input if this one is not \code{NULL}.
 #' @param smorder integer, the order of smoothness of the projection space; This parameter is overridden by  the SLOT \code{basis@smorder} of the \code{basis} input if this one is not \code{NULL}.
+#' @param periodic logical, a flag to indicate if B-splines will be of periodic type or not; In the case of periodic splines, the arguments of the input and the knots need to be within [0,1] or, otherwise, an error occurs and a message advising the recentering and rescaling data is shown. 
 #' @param basis \code{Splinets}-object, the basis used for the representation of the projection of the input \code{fdsp};
-#' @param type string, the choice of the basis in the projection space used only if the \code{bais}-parameter is not given; The following choices are available 
+#' @param type string, the choice of the basis in the projection space used only if the \code{basis}-parameter is not given; The following choices are available 
 #' \itemize{
 #'   \item \code{'bs'} for the unorthogonalized B-splines,
 #'   \item \code{'spnt'} for the orthogonal splinet (the default),
@@ -18,9 +19,17 @@
 #'   \item \code{'twob'} for the two-sided OB-splines.
 #'  } 
 #' The default is \code{'spnt'}. 
-#' @param graph logical, indicator if the illustrative plots are to be produced;
-#' @return The value of the function is a list made of three elements
+#' @param graph logical, indicator if the illustrative plots are to be produced:
+#'  \itemize{
+#'   \item the splinet used in the projection(s) on the dyadic grid,
+#'   \item the coefficients of the projection(s) on the dyadic grid,
+#'   \item the input function(s),
+#'   \item the projection(s).
+#'  } ;
+#' @return The value of the function is a list made of four elements
 #' \itemize{
+#'   \item \code{project$input} -- \code{fdsp}, when the input is a \code{Splinets}-object or a matrix with the first column in an increasing order,
+#'   otherwise it is the input numeric matrix after ordering according to the first column, 
 #'   \item \code{project$coeff} -- \code{N x (n-k+1)} matrix of the coefficients of representation of the projection of the input in the splinet basis,
 #'   \item \code{project$basis} -- the spline basis,
 #'   \item \code{projedt$sp} -- the \code{Splinets}-object containing the projected splines.
@@ -49,30 +58,69 @@
 #' @importFrom utils capture.output head tail
 #' 
 
-project = function(fdsp, knots=NULL, smorder=3, basis=NULL, type='spnt', graph=FALSE){
-  
-  
-  proj=list(coeff=NULL,basis=NULL,sp=NULL) #this is where output is kept
+project = function(fdsp, knots=NULL, smorder=3, periodic=FALSE, basis=NULL, type='spnt', graph=FALSE){
+
+
+proj=list(input=NULL,coeff=NULL,basis=NULL,sp=NULL) #this is where output is kept
 
 ############################
 ###Checking Input values####
 ############################
- #In the first part, the proper input values are checke so that 
+ #In the first part, the proper input values are check so that 
  #the projection space is properly decided for.
-  
+  if(periodic==TRUE){
+    #Checking if all arguments of functions are within [0,1]
+    if(is.matrix(fdsp)){
+      Mi=min(fdsp[,1])
+      Ma=max(fdsp[,1])
+      if(Mi<0||Ma>1){stop("The argument of the input data is not normalized to be in [0,1], which is required for the periodic case.\n
+Consider renormalization.")
+        }
+    }else{
+      Mi=min(fdsp$knots)
+      Ma=max(fdsp$knots)
+      if(Mi<0||Ma>1){stop("The knots of the input spline data are not normalized to be in [0,1], which is required for the periodic case.\n
+Consider renormalization.")
+        }
+    }
+    if(!is.null(knots)){
+      Mi=min(knots)
+      Ma=max(knots)
+      if(Mi<0||Ma>1){stop("The specified knots are not normalized to be in [0,1], which is required for the periodic case.\n
+Consider renormalization.")
+      }
+    }
+      if(!is.null(basis)){
+        Mi=min(basis$knots)
+        Ma=max(basis$knots)
+        if(Mi<0||Ma>1){stop("The knots of the input basis are not normalized to be in [0,1], which is required for the periodic case\n
+Consider renormalization.")
+        }
+      }   
+  }
   if(!is.null(knots)){
     if(min(diff(knots))<0){
       knots=sort(unique(knots))
       cat("The knots were not given in the strictly increasing order, which is required. The ordered knots with removed ties are replacing the input knot values.\n")
     }
-  } #ordering knots and remove their ties (if given in the input)
+  } #ordering knots and remove their ties (if present in the input) and transfering to the radian scale for the periodic case
+
+  
   
   if(is.matrix(fdsp)){#in the case of the matrix input, we order the first column
-  or=order(fdsp[,1])
-  fdsp=fdsp[or,] #The ordering of the data with respect to the first column
-  if(is.null(knots) & is.null(basis)){# no Splinets in the input thus knots have to be taken from the argument
+  ld=length(fdsp[,1])
+  isord=min(fdsp[2:ld,1]-fdsp[1:(ld-1),1])
+  if(isord < 0){
+    or=order(fdsp[,1])
+    fdsp=fdsp[or,] #The ordering of the data with respect to the first column
+    cat("The input numerical data were not given in the increasing order.\n The data are ordered and returned in the ordered form as the first value in the output list.\n")
+  }
+  
+  proj$input=fdsp #The input data are returned as the first element in the output list.
+  
+  if(is.null(knots) & is.null(basis)){# no basis and knots in the input thus knots have to be taken from the argument
     knots=fdsp[,1]
-    cat("The knots set to the first column in the input matrix.\n")
+    cat("The knots set to the first column in the input matrix.\n") #note that for periodic case these are now normalized.
   }#the first column of the input matrix is a natural choice for knots if they are not given 
 }
   if(!is.null(basis)){#if the basis is provided then all parameters are taken from it
@@ -97,9 +145,10 @@ project = function(fdsp, knots=NULL, smorder=3, basis=NULL, type='spnt', graph=F
     }
   }
   
+  #transformed to the radian-scale.
   k=smorder #for convenience
  #At this point all the inputs are resolved to be coherent
-
+  
   ####################################
   ######The main part of the code#####
   ####################################
@@ -121,8 +170,8 @@ The ", drop, " values at the arguments outside the projection range will not aff
      
       
       if(is.null(proj$basis)){#the basis needs to be built
-        
-        bsp=splinet(knots,smorder,type) #This in the orthogonal basis case builds both the B-splines and the OB-splines
+        bsp=splinet(knots=knots, smorder = smorder, type = type, Bsplines=basis, periodic= periodic)
+         #This in the orthogonal basis case builds both the B-splines and the OB-splines
         
         if(type =='bs'){# the case of the B-splines (non-orthogonal basis)
           
@@ -130,7 +179,7 @@ The ", drop, " values at the arguments outside the projection range will not aff
           
           #At the moment the basis is not normalized because the default 
           #in 'splinet' generates unnormalized version of the B-splines
-          obs=splinet(Bsplines = bsp$bs,norm = TRUE) #computing the orthogonal splines and the input B-splines are normalized
+          obs=splinet(Bsplines = bsp$bs,norm = TRUE, periodic = periodic) #computing the orthogonal splines and the input B-splines are normalized
           #the first argument is the  B-spline basis unnormalized         
           
           #Computing the coefficients of the projection
@@ -186,7 +235,7 @@ The ", drop, " values at the arguments outside the projection range will not aff
           # the case of the B-splines (non-orthogonal basis)
           #At the moment the basis is not normalized because the default 
           #in 'splinet' generates unnormalized version of the B-splines
-          obs=splinet(Bsplines = proj$basis,norm = TRUE) #computing the orthogonal splines and the input B-splines is normalized
+          obs=splinet(Bsplines = proj$basis,norm = TRUE,periodic = periodic) #computing the orthogonal splines and the input B-splines is normalized
           
           #Computing the coefficients of the projection
           N=diag(1/sqrt(gramian(proj$basis,norm_only=TRUE))) #The normalizing matrix, can be the identity if th
@@ -240,7 +289,7 @@ The ", drop, " values at the arguments outside the projection range will not aff
       
       if(is.null(proj$basis)){#the basis needs to be built
         
-        bsp=splinet(knots,smorder,type) #This in the orthogonal basis builds both the B-splines and the OB-splines
+        bsp=splinet(knots,smorder,type,periodic = periodic) #This in the orthogonal basis builds both the B-splines and the OB-splines
 
         if(type =='bs'){# the case of the B-splines (non-orthogonal basis)
           
@@ -248,7 +297,7 @@ The ", drop, " values at the arguments outside the projection range will not aff
           
           #At the moment the basis is not normalized because the default 
           #in 'splinet' generates unnormalized version of the B-splines
-          obs=splinet(Bsplines = bsp$bs,norm = TRUE) #computing the orthogonal splines and the input B-splines are normalized
+          obs=splinet(Bsplines = bsp$bs,norm = TRUE,periodic = periodic) #computing the orthogonal splines and the input B-splines are normalized
           
           #Computing the coefficients of the projection
           N=diag(1/sqrt(gramian(bsp$bs,norm_only=TRUE))) #The normalizing matrix will be needed to express the result in the n
@@ -288,13 +337,13 @@ The ", drop, " values at the arguments outside the projection range will not aff
        #the end of the case when the basis is built 
       }else{#the basis is provided and assigned to 'proj$basis', 'knots' and 'smorder' have been already assigned
           
-          type=proj$basis@type
+          type=proj$basis@type #The type is inherited from the type of the given basis
           if(type=='bs'){
             # the case of the B-splines (non-orthogonal basis)
             #At the moment the basis can be not normalized          
             
             #The splinet corresponding to the B-spline basis still needs to be computed
-            obs=splinet(Bsplines = proj$basis,norm = TRUE) #The output will have B-splines orthogonalized
+            obs=splinet(Bsplines = proj$basis,norm = TRUE,periodic = periodic) #The output will have B-splines orthogonalized
             
             #Computing the coefficients of the projection
             N=diag(1/sqrt(gramian(proj$basis,norm_only=TRUE))) #The normalizing matrix (could be identity if the original matrix
@@ -331,7 +380,7 @@ The ", drop, " values at the arguments outside the projection range will not aff
               proj$coeff=gramian(Sp=embfdsp,Sp2=embbase)  #evaluating the inner products in the embedding space
             }
           }
-     #The end of the casis that the basis was given for the splinet input cae    
+     #The end of the case that the basis was given for the splinet input case    
       }
       
     #The end of the splinet input case  
@@ -342,23 +391,30 @@ proj$sp=lincomb(proj$basis,proj$coeff)
 if(graph == TRUE){
   ourcol=c('deepskyblue4', 'darkorange3', 'goldenrod', 'darkorchid4',
            'darkolivegreen4', 'deepskyblue', 'red4', 'slateblue')
+  
+  
+  #Plotting the basis - First graph
   dev.new()
-  #Plotting the basis
-  plot(proj$basis)
-  dev.new()
-  #Plotting the coefficents
-  n=length(proj$basis@knots) #The number of all knots (including the in)
-  k=proj$basis@smorder #So that the number of basis elements is: n-k+1, total number of knots is n+2
-  #n-(n-k-1)=k+1 if k is odd then we drop (k+1)/2 from each side and the rest of knots
-  #corresponds to the centers of the elements of the basis
-  #if k is even we drop k/2 knots  from each side and take the midpoints of the rest
-  #as the centers of the elements of the basis. 
-  if((k%%2)==0){
-    x1=matrix(proj$basis@knots[(k/2+1):(n-k/2)],ncol=1)
-    x=(x1[1:dim(x1)[1]-1,1]+x1[2:dim(x1)[1],1])/2
-  }else{
-    x=matrix(proj$basis@knots[((k+1)/2+1):(n-(k+1)/2)],ncol=1)
-  }
+  plot(proj$basis,main='The basis of the projection') #The plot method recognize periodic from non-periodic
+  #The end of the first graph
+  
+  
+  #Plotting the coefficents = Second graph
+  dev.new() #A new graphical window
+  if (!proj$basis@periodic) { #The regular (non-periodic) case
+    n=length(proj$basis@knots) #The number of all knots (including the two endpoints)
+    k=proj$basis@smorder #So that the number of basis elements is: n-k-1, here is the count: 
+    #total number of knots is n, each B-spline extends over k+2 knots
+    #if k is odd then we drop (k+1)/2 from each end side and the rest of knots
+    #corresponds to the centers of the elements of the basis
+    #if k is even we drop k/2 knots  from each end side and take the midpoints of the rest
+    #as the centers of the elements of the basis (the number of knots . 
+    if((k%%2)==0){
+      x1=matrix(proj$basis@knots[(k/2+1):(n-k/2)],ncol=1)
+      x=(x1[1:dim(x1)[1]-1,1]+x1[2:dim(x1)[1],1])/2 #these locations identify elements of the basis 
+    }else{
+      x=matrix(proj$basis@knots[((k+1)/2+1):(n-(k+1)/2)],ncol=1) #these locations identify elements of the basis
+    }
   
   if(type=='spnt'){#special dyadic structure ploting for the splinet case
     n_so = length(proj$basis@der)
@@ -367,8 +423,6 @@ if(graph == TRUE){
     n = length(xi) #the total number of knots (including endpoints)
     y = t(proj$coeff)
     xrange=range(xi)
-    
-    
     
     #Setting the plot parameters, margins, number of plots,
     mrgn=1.5
@@ -398,24 +452,156 @@ if(graph == TRUE){
     
   # 
   }else{
-  XY=cbind(x,t(proj$coeff))
-  matplot(XY[,1],XY[,-1],pch='+',cex=1,col=ourcol,main='Coefficents of the projections',xlab='basis spline location',ylab='coefficient', bty="n")
+    XY=cbind(x,t(proj$coeff))
+    matplot(XY[,1],XY[,-1],pch='+',cex=1,col=ourcol,main='Coefficents of the projections',xlab='basis spline location',ylab='coefficient', bty="n")
   
-  abline(h = 0)
+    abline(h = 0)
   
-  abline(v = x, lty = 3, lwd = 0.5)
+    abline(v = x, lty = 3, lwd = 0.5)
   }
+  }else{#the periodic case - ploting coefficients
+    
+    n=length(proj$basis@knots) #The number of all knots (including the endpoints so on the
+    #circle first and the last are counted twice)
+    k=proj$basis@smorder #So that the number of basis elements is: n-k-1 of the regular splines 
+    #plus k that at added to cover the k basis elements corresponding knots around zero
+    # These basis elements sit at the top level and come from the periodic boundary condition. 
+    # The total number of the basis elements is the same as total number of knots,
+    # i.e. n-1 (substraction of one comes from counting seperately the last and first knot).
+    # See also non-periodic for the count.
+    
+    #The location on the circle where the values of the coefficient will be plot 
+    if((k%%2)==0){
+      x1=matrix(proj$basis@knots[(k/2+1):(n-k/2)],ncol=1) #The endpoints
+      x=matrix((x1[1:dim(x1)[1]-1,1]+x1[2:dim(x1)[1],1])/2,ncol=1)  #The midpoints
+    }else{
+      x=matrix(proj$basis@knots[((k+1)/2+1):(n-(k+1)/2)],ncol=1)
+    }
+    #At this point x contains only the locations from the regular case, next, we add the knots
+    #that cover the last k basis elements that come from the periodic boundary condition
+    if((k%%2)==0){
+      #Around the origin one needs to define the midpoints
+      #First, k/2 midpoints below the origin 0=1, which requires the last k/2+1 knots
+      #the last being treated as 1 not as 0
+      x1=matrix(proj$basis@knots[(n-k/2):(n)],ncol=1)
+      xx=matrix((x1[1:(k/2),]+x1[2:(k/2+1),])/2,ncol=1) #k/2 midpoints below 1=0
+      x2=matrix(proj$basis@knots[1:((k/2)+1)],ncol=1) 
+      xx=rbind(xx,matrix((x2[1:(k/2),]+x2[2:(k/2+1),])/2,ncol=1))
+    }else{
+      xx=matrix(c(proj$basis@knots[(n-(k-1)/2):(n-1)],proj$basis@knots[1:((k+1)/2)]),ncol=1) 
+    }#starting from n-(k+1)/2+1 to (n-(k+1)/2+k)mod(n-1)  
+    
+    x=rbind(x,xx) #the locations are added at the end, at this point x is made of n-1 elements
+   
+      y = t(proj$coeff) #This is where the coefficients are kept
+      
+      #The midpoints in the polar coordinates. The scaling is in fact not needed because the konts are in [0,1]
+      x= 2*pi*(x-proj$basis@knots[1])/(proj$basis@knots[n]-proj$basis@knots[1]) # transfer knots to radians
+    
+      ma=max(abs(y)) #range of the coefficients
+      
+      a=log(2)/ma #The scaling see also description of the plots for periodic splines and splinets
+      
+      #The knots endpoints in the polar coordiantes (the scaling is not needed because knots are suppose to be on [0,1])
+      xxx=2*pi*(proj$basis@knots-min(proj$basis@knots))/(max(proj$basis@knots)-min(proj$basis@knots))
+      
+    if(type=='spnt'){#special dyadic structure ploting for the splinet case
+        net_str = net_structure(n-k-1, k) #extracts the levels and tuplets and individual splines for 
+        #the number of splines n-k-1 of order k (here n is the number of all knots including endpoints) 
+        #the first column of 'net_str' are the numbers of knots 1:(n-k-1), the second identifies the level index 
+        #(top is the lowest level, bottom the highest, which opposite which we normally denoted in the paper), 
+        #this function is used from the zero boundary splines so the last k-tuple of the periodic case is not considered
+        
+        n_level = max(net_str[, 2])
+        
+        ##Coefficients of projection - setting coordinates for dyadic structure
+        c=rep(2*n_level, length(xxx)) #all vallues will be within this circle
+        polar_plot(xxx, c, lty= 3,  col = "red",  main = 'Coefficients of the projections')
+        
+        for(i in 1:(n_level-1)){#maximal circles for the remaining levels (they will be also -infinity levels for one up levels)
+          c=rep(2*(n_level-i), length(xxx))
+          polar_lines(xxx, c, lty= 3,  col = "red") 
+          }
+        #The circles corresponding to zero level at each pyramid level
+        for(i in 1:(n_level)){#maximal circles for the remaining levels (they will be also -infinity levels for one up levels)
+          c=rep(2*(n_level-i)+1, length(xxx))
+          polar_lines(xxx, c, lty= 1) 
+          }
+        #Plotting the dashed lines at the knot locations
+        
+        for(i in 1:length(xxx)){
+          polar_lines(c(xxx[i],xxx[i]),c(0,2*(n_level)),lty=3)
+          } 
+
+        
+        for(i in 1:n_level){
+          seqID = net_str[which(net_str[,2] ==  n_level-i+1), 1]
+          for(j in seqID){ #the center of a spline and thus its position is shifted by k-1 forward from the position of the coefficient in y
+            polar_lines(x[j],2*(n_level-i)+ exp(a* y[j]) ,type = "p",pch='+',cex=1.5,col=ourcol[j%%8+1])
+            polar_lines(c(x[j],x[j]),c(2*(n_level-i)+1, 2*(n_level-i)+exp(a*y[j])), type = "l",lwd=2,col=ourcol[j%%8+1]) 
+            }
+          }
+        for(j in (n-k):(n-1)){ #There is total n-1 coefficient to be plotted (this is the number of basis elements)
+          polar_lines(x[j],exp(a* y[j]),type = "p",pch='+',cex=1.5,col=ourcol[(j+1)%%8+1])
+          polar_lines(c(x[j],x[j]),c(1,exp(a* y[j])), type = "l",lwd=2,col=ourcol[(j+1)%%8+1])
+          }
+      }else{# Regular coefficents on a single circular plot
+        c=rep(2, length(xxx)) #the maximal value of the radius in the polar represantion
+        
+        polar_plot(xxx, c, lty= 3,  col = "red",  main = 'Coefficients of the projections')
+        c_1=rep(1, length(xxx))
+        polar_lines(xxx, c_1, type = "l",col="blue")
+        c_2=rep(exp(-a*ma), length(xxx)) #the lower bound of the radius in the polar represantion
+        polar_lines(xxx, c_2, type = "l",lty=3, col="red")
+        for(i in 1:length(x)){
+          polar_lines(c(x[i],x[i]),c(0,2),lty=3,col='black')
+        } 
+        
+        for (i in 1:length(y)) {
+          polar_lines(x[i], exp(a*y[i]),type = "p",pch='+', cex=1.5, col = ourcol[i%%8+1])
+          polar_lines(c(x[i],x[i]),c(1,exp(a*y[i])), type = "l",lwd=2,col=ourcol[i%%8+1]) 
+        }
+        graphics::text(exp(a*ma)-0.1,0.1,labels=signif(ma,2))
+        graphics::text(1-0.1,0.1,labels=0)
+        graphics::text(exp(-a*ma)-0.1,0.1,labels=signif(-ma,2))
+      }
+      
+  }#The end of the second graphical illustration
+  
+
+ #The third graph - the input data
   dev.new()
-  #Plotting the data
-  if(is.matrix(fdsp)){
-    matplot(fdsp[,1],fdsp[,-1],pch='.',cex=3,col=ourcol,main='Discrete functional data',xlab='',ylab='', bty="n")
-  }
-  else{
-    plot(fdsp)
-  }
+  
+  if(is.matrix(fdsp)){#The discrete data as the input
+    if (!proj$basis@periodic) {# The non-periodic case
+      matplot(fdsp[,1],fdsp[,-1],pch='.',cex=3,col=ourcol,main='Discrete functional data',xlab='',ylab='', bty="n")
+      }else{
+        #The periodic case
+        x= 2*pi*fdsp[,1]
+        l=dim(fdsp[,-1,drop=F])[2]
+        ma=max(fdsp[,-1,drop=F])
+        mi=min(fdsp[,-1,drop=F])
+        a=log(2)/ma
+        
+        xxx=2*pi*seq(0,1,by=0.01)
+        c=rep(2, length(xxx))
+        polar_plot(xxx, c, lty= 3,  col = "red",  main = 'Discretized input data')
+        c_1=rep(1, length(xxx))
+        polar_lines(xxx, c_1, type = "l",col="blue")
+        c_2=rep(exp(-a*mi), length(xxx)) #the lower bound of the radius in the polar represantion
+        polar_lines(xxx, c_2, type = "l",lty=3, col="red")
+        polar_lines(x, exp(a*fdsp[,-1,drop=F]),type = "p",pch='.', cex=3.5) #ploting data
+        graphics::text(exp(a*ma)+0.1,0.1,labels=signif(ma,2))
+        graphics::text(1+0.1,0.1,labels=0)
+        graphics::text(exp(a*mi)-0.1,0.1,labels=signif(mi,2))
+      }#End of the discrete data case
+   }else{#The functional data as the input
+    plot(fdsp,main='Input: functional data')
+   }
   dev.new()
   #Plotting the projections
-  plot(proj$sp, main='Data projections')
+  plot(proj$sp, main='Data projection')
 }
+
 return(proj)
 }

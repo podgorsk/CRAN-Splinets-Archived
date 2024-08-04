@@ -6,7 +6,7 @@
 #' @param object \code{Splinets} object containing \code{d} splines;
 #' @param A \code{l x d} matrix; coefficients of the linear transformation,
 #' @param reduced logical; If \code{TRUE} (default), then the linear combination is 
-#' calculated accounting the actual support sets (recommended for sparse splines), 
+#' calculated accounting for the actual support sets (recommended for sparse splines), 
 #' if \code{FALSE}, then the 
 #' full support computations are used (can be faster for lower dimension or non-sparse cases).
 #' @param SuppExtr logical; If \code{TRUE} (default), the true support is extracted, otherwise, full range 

@@ -2,7 +2,7 @@
 #----Splinet, equally spaced knots-----#
 #--------------------------------------#
 k=2 # order
-n_knots = 12 # number of knots
+n_knots = 5 # number of knots
 xi = seq(0, 1, length.out = n_knots)
 
 so = splinet(xi, k)
@@ -38,7 +38,7 @@ plot(so$os,type="simple",vknots=FALSE)
 #-------------------------------------#
 #---Splinet, unequally spaced knots---#
 #-------------------------------------#
-n_knots=30
+n_knots=25
 
 xi = c(0, sort(runif(n_knots)), 1)
 
@@ -161,6 +161,96 @@ so = splinet(Bsplines=sody$bs, type = 'twob')
 plot(so$os)
 
 gm = gramian(so$os) #verification of the orthogonality
+diag(gm)
+sum(gm - diag(diag(gm)))
+
+#--------------------------------------------#
+#---Periodic splinet, equally spaced knots---#
+#--------------------------------------------#
+k=2 # order
+n_knots = 12 # number of knots
+xi = seq(0, 1, length.out = n_knots)
+
+so = splinet(xi, k, periodic = TRUE)
+
+plot(so$bs) #Plotting B-splines
+plot(so$os) #Plotting Splinet
+
+#Verifying the orthogonalization
+gm = gramian(so$os) #evaluation of the inner products
+diag(gm)
+sum(gm - diag(diag(gm)))
+
+#An example of the dyadic structure with equally spaced knots
+k=3
+N=3
+n_knots=2^N*k-1 #the number of internal knots for the dyadic case
+
+xi = seq(0, 1, length.out = n_knots+2)
+
+so = splinet(xi, periodic = TRUE) 
+
+plot(so$bs,type="simple") #Plotting B-splines in a single simple plot
+plot(so$os,type="simple") 
+
+plot(so$os) #Plotting the splinet on the dyadic net of support intervals
+
+so=splinet(xi, Bsplines=so$bs, type='gsob') #Obtaining the Gram-Schmidt orthogonalization
+plot(so$os,type="simple")      #Without computing B-splines again
+
+so=splinet(xi, Bsplines=so$bs , type='twob') #Obtaining the symmetrize orthogonalization
+plot(so$os,type="simple")  
+
+
+#-------------------------------------#
+#---Splinet, unequally spaced knots---#
+#-------------------------------------#
+n_knots=25
+
+xi = c(0, sort(runif(n_knots)), 1)
+
+sone = splinet(xi, k, periodic = TRUE)
+
+plot(sone$bs, type='dyadic') #Plotting B-splines
+plot(sone$os) #Plotting Splinet
+
+#Verifying the orthogonalization
+gm = gramian(sone$os) #evaluation of the inner products
+diag(gm)
+sum(gm - diag(diag(gm)))
+
+#------------------------------------------#
+#---Dyadic splinet, equally spaced knots---#
+#------------------------------------------#
+k = 2 # order
+N = 3 # support level
+n_so = k*(2^N-1) # number of splines in a dyadic structure with N and k
+n_knots = n_so + k + 1 # number of knots
+xi = seq(0, 1, length.out = n_knots)
+
+sodyeq = splinet(xi, k, periodic = TRUE)
+
+plot(sodyeq$bs) #Plotting B-splines
+plot(sodyeq$os) #Plotting Splinet
+
+#Verifying the orthogonalization
+gm = gramian(sodyeq$os) #evaluation of the inner products
+diag(gm)
+sum(gm - diag(diag(gm)))
+
+#--------------------------------------------#
+#---Dyadic splinet, unequally spaced knots---#
+#--------------------------------------------#
+xi = c(0, sort(runif(n_knots)), 1)
+
+sody = splinet(xi, k, periodic = TRUE)
+
+
+plot(sody$bs) #Plotting B-splines
+plot(sody$os) #Plotting Splinet
+
+#Verifying the orthogonalization
+gm = gramian(sody$os) #evaluation of the inner products
 diag(gm)
 sum(gm - diag(diag(gm)))
 

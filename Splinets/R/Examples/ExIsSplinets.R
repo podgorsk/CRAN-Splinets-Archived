@@ -10,12 +10,9 @@ sp@equid #equidistance flag
 #Diagnostic of 'Splinets' object 'sp'
 is.splinets(sp)
 
-
 IS=is.splinets(sp)
 IS[[1]] #informs if the object is a spline
 IS$is   #equivalent to the above
-
-cat(IS$Report) #printing the diagnostic report into the terminal
 
 #Third order splines with a noisy matrix of the derivative
 set.seed(5)
@@ -27,9 +24,7 @@ sp@taylor
 IS[[2]]@der #corrections
 sp@der
 
-cat(IS$Report) #printing the diagnostic report into the terminal
-
-is.splinets(IS[[2]]) #The output object is a valid 'Splinets'-object
+is.splinets(IS[[2]]) #The output object is a valid splinet
 
 #-----------------------------------------------------#
 #--------Full support non-equidistant cases-----------#
@@ -46,11 +41,10 @@ sp@knots #vs. corrected ones
 sp@taylor
 
 #Diagnostic of 'Splinets' object 'sp'
+is.splinets(sp)
 
 IS=is.splinets(sp)
-
-cat(IS$Report) 
-
+ 
 nsp=IS$robject #the output spline -- a corrected version of the input
 nsp@der
 sp@der
@@ -86,7 +80,6 @@ sp=new("Splinets",knots=xi,supp=support)
 is.splinets(sp)
 
 IS=is.splinets(sp)
-cat(IS$Report)
 
 sum(sp@supp[[1]][,2]-sp@supp[[1]][,1]+1) #the number of knots in the support
 dim(IS[[2]]@der[[1]])[1]  #the number of rows in the derivative matrix
@@ -102,7 +95,6 @@ SS=list(matrix(rnorm(m*(k+1)),ncol=(k+1))) #the derivative matrix at random
 sp=new("Splinets",knots=xi,smorder=k,supp=support,der=SS) 
 
 IS=is.splinets(sp)
-cat(IS$Report)
 
 m=sum(sp@supp[[1]][,2]-sp@supp[[1]][,1]+1) #the number of knots in the support
 sp@der=list(matrix(rnorm(m*(k+1)),ncol=(k+1))) #the derivative matrix at random

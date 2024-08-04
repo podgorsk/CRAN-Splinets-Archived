@@ -4,14 +4,13 @@
 #' \code{Splinets}--class. In the case when all the properties are satisfied the logical \code{TRUE} is returned. Otherwise,
 #' \code{FALSE} is returned together with suggested corrections.
 #' @param object \code{Splinets} object, the object to be diagnosed; For this object to be corrected properly each support interval has to have at least \code{2*smorder+4} knots.
-#' @return A list made of: a logical value \code{is}, a \code{Splinets} object \code{robject}, a numeric value \code{Er}, and a string \code{Report}.
+#' @return A list made of: a logical value \code{is}, a \code{Splinets} object \code{robject}, and a numeric value \code{Er}.
 #' \itemize{
 #' \item The logical value \code{is} indicates if all the condtions for the elements of \code{Splinets} object to be a collection of valid
 #' splines are satisfied, additional diagnostic messages are printed out.
 #' \item The object \code{robject} is a modified input object that has all SLOT fields modified so the conditions/restrictions
 #' to be a proper spline are satisfied.
 #' \item The numeric value \code{Er} is giving the total squared error of deviation of the input matrix of derivative from the conditions required for a spline. 
-#' \item The string \code{Report} contains a detailed report on the diagnostic, use \code{cat(is.splinet$Report)} to print out the report. 
 #' }
 #' @export
 #' 
@@ -38,24 +37,15 @@ setGeneric("is.splinets",     #This creates a generic call that will be later sp
 #' @param object \code{Splinets} object, the object to be diagnosed; 
 #' @rdname is.splinets-methods
 #' @aliases is.splinets,Splinets-method
-#' @return A list made of: a logical value \code{is}, a \code{Splinets} object \code{robject}, a numeric value \code{Er}, and a string \code{Report}..
-#' \itemize{
-#' \item The logical value \code{is} indicates if all the condtions for the elements of \code{Splinets} object to be a collection of valid
-#' splines are satisfied, additional diagnostic messages are printed out.
-#' \item The object \code{robject} is a modified input object that has all SLOT fields modified so the conditions/restrictions
-#' to be a proper spline are satisfied.
-#' \item The numeric value \code{Er} is giving the total squared error of deviation of the input matrix of derivative from the conditions required for a spline. 
-#' \item The string \code{Report} contains a detailed report on the diagnostic, use \code{cat(is.splinet$Report)} to print out the report. 
-#' }
 #' 
 setMethod(
   "is.splinets","Splinets", #Here the class specification of the generic "is.splinets" is made
   function(object) {
-    Report="\n\nDIAGNOSTIC CHECK of a SPLINETS object"
-    
+    cat("\n\nDIAGNOSTIC CHECK of a SPLINETS object\n\n")
+
     ######### KNOTS
     
-    Report=paste(Report,"\n\nTHE KNOTS:  \n")
+    cat("THE KNOTS:  \n")
     is=TRUE  #The flag to be returned in the list
     robject=object #The modified input object that will be returned from the function
 
@@ -63,8 +53,8 @@ setMethod(
     n <- length(object@knots)-2
     k=object@smorder
     if (n < k) {
-      Report=paste(Report,"SLOT 'knots' in a 'splinets' object should be a vector of at least length ", k+2, "\n")
-      stop("Reconsider a vector of increasing values for SLOT 'knots'.\n See 'Report' field in the output list, for more information.")
+      cat("SLOT 'knots' in a 'splinets' object should be a vector of at least length ", k+2, "\n")
+      stop("Reconsider a vector of increasing values for SLOT 'knots'.")
     }
 
     #Second: checking if the order of knots is strictly increasing
@@ -72,7 +62,7 @@ setMethod(
     if(m<=0){
       is=FALSE
       robject@knots=sort(unique(object@knots))
-      Report=paste(Report,"Knots are not in the strictly increasing order, which is required.\n
+      cat("Knots are not in the strictly increasing order, which is required.\n
 Ordered  knots with removed ties are given in the output `Splinets' object.\n")
     }
 
@@ -81,14 +71,14 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
     errkn=max(eqd)-min(eqd)
     if(errkn>(0.01*object@epsilon)){
       if(robject@equid==TRUE){
-        Report=paste(Report,"Absolute deviation from the equidistant state is ",errkn*100, "%\n")
-        Report=paste(Report,"SLOT 'equd'  in the output splinets object is set to FALSE.\n")
+        cat("Absolute deviation from the equidistant state is ",errkn*100, "%\n")
+        cat("SLOT 'equd'  in the output splinets object is set to FALSE.\n")
       }
       robject@equid=FALSE
     }else{
       if(robject@equid==FALSE){
-        Report=paste(Report,"Absolute deviation from the equidistant state is ",errkn*100, "%.\n")
-        Report=paste(Report,"SLOT 'equd'  in the output splinets object is set to TRUE.\n")
+        cat("Absolute deviation from the equidistant state is ",errkn*100, "%.\n")
+        cat("SLOT 'equd'  in the output splinets object is set to TRUE.\n")
       }
       robject@equid=TRUE
     }
@@ -105,7 +95,7 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
 
 
     if(dim(object@taylor)[2]!=(k+1)){ #If the matrix has been evaluated before, then it has 'k+1' columns
-      Report=paste(Report,"The Taylor expansion coefficient matrix does not have the proper number of columns.\n")
+      cat("The Taylor expansion coefficient matrix does not have the proper number of columns.\n")
       is=FALSE
       if(robject@equid==TRUE){
         robject@taylor<-taylor_coeff(object@knots[1:2],k) #all the coefficients for all other knots are the same as for
@@ -113,29 +103,29 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
       }else{
         robject@taylor<-taylor_coeff(object@knots,k)
       }
-      Report=paste(Report,"The Taylor coefficient has been evaluated and assigned to the output 'Splinets-object'.\n")
+      cat("It is evaluated now and assigned to the output.\n")
     }else{
       if(robject@equid==FALSE){
         if(dim(object@taylor)[1]!=(n+1)){#If the matrix has been evaluated before, then it has 'n+1' columns in the non-equidistant case
-          Report=paste(Report,"The proper Taylor expansion coefficient matrix does not have the proper number of rows.\n")
+          cat("The proper Taylor expansion coefficient matrix does not have the proper number of rows.\n")
           is=FALSE
           robject@taylor<-taylor_coeff(object@knots,k)
-          Report=paste(Report,"The Taylor coefficient has been evaluated and assigned to the output.\n")
+          cat("It is evaluated now and assigned to the output.\n")
           }
       }else{
         if(dim(object@taylor)[1]!=1){#If the matrix has been evaluated before, then it has 'n+1' columns in the non-equidistant case
-          Report=paste(Report,"The proper Taylor expansion coefficient matrix does not have the proper number of rows.\n")
+          cat("The proper Taylor expansion coefficient matrix does not have the proper number of rows.\n")
           is=FALSE
           robject@taylor<-taylor_coeff(object@knots[1:2],k) #all the coefficients for all other knots are the same as for
           #the first two
-          Report=paste(Report,"The Taylor coefficient has been evaluated and assigned to the output.\n")
+          cat("It is evaluated now and assigned to the output.\n")
         }
       }
     }
     
     ################ SUPPORT SETS
 
-    Report=paste(Report,"\n\nTHE SUPPORT SETS:  \n\n")
+    cat("\n\nTHE SUPPORT SETS:  \n\n")
     
     #Two cases: full support for all splines and not full support
     
@@ -143,7 +133,7 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
  
     if(sz==0){ #CASE 1:the full support
       
-      Report=paste(Report,"The support sets for the splines are equal to the entire range of knots.\n")
+      cat("The support sets for the splines are equal to the entire range of knots.\n")
       robject@supp=object@supp # the empty list in this case
       
       #END CASE 1
@@ -156,13 +146,13 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
         le=0 #to mark ending of the preceeding interval in the loop
         for(j in 1:Nsup) {#Running through the intervals of the support
           if((ss[j,1]-le)<1){
-            Report=paste(Report,"SLOT 'supp' in the input 'splinets' object is not valid.\n The rows in the matrices should form separated disjoint intervals but they overlap.\n")
-            stop("Review the values in SLOT 'supp'.\n See 'Report' field in the output list, for more information.")
+            cat("SLOT 'supp' in the input 'splinets' object is not valid. \n The rows in the matrices should form separated disjoint intervals but they overlap.\n")
+            stop("Review the values in SLOT 'supp'.")
           }
           le=ss[j,2]
           if((ss[j,2]-ss[j,1])<(k+1)){
-            Report=paste(Report,"SLOT 'supp' in the input 'splinets' object is not valid. \n The rows in the matrices should correspond to", k+2, "knots in each support interval.\n")
-            stop("Not enough knots per interval in the support, review the values in SLOT 'supp'.\n See 'Report' field in the output list, for more information.")
+            cat("SLOT 'supp' in the input 'splinets' object is not valid. \n The rows in the matrices should correspond to", k+2, "knots in each support interval.\n")
+            stop("Not enough knots per interval in the support, review the values in SLOT 'supp'.")
           }
         }
         robject@supp[[i]]=ss 
@@ -172,7 +162,7 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
     }
     ##################The most important fields of the splinets class###############
 
-    Report=paste(Report,"\n\nTHE DERIVATIVES AT THE KNOTS:  \n\n")
+    cat("\n\nTHE DERIVATIVES AT THE KNOTS:  \n\n")
         
     #The diagnostic has two parts: Part I: Checking the dimentions of the matrices of derivatives at the knots
                                 #  Part II: Checking the boundary conditions for the matrices
@@ -186,24 +176,24 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
       for(j in 1:size){#Running through all the splines in the object
         if(prod(dim(object@der[[j]])==c(n+2,k+1))==0){
           is=FALSE
-          Report=paste(Report,"The full support range case.\n")
-          Report=paste(Report,"SLOT 'der' do not have properly set the dimension for spline", j,"in the input 'Splinets' object.\n")
-          Report=paste(Report,"In the output object, it is set temporarily to the matrix of 'ones' with the proper dimension.\n\n")
+          cat("The full support range case.\n")
+          cat("SLOT 'der' do not have properly set the dimension for spline", j,"in the input 'Splinets' object.\n")
+          cat("In the output object, it is set temporarily to the matrix of 'ones' with the proper dimension.\n\n")
           robject@der[[j]]=matrix(1,nrow=n+2,ncol=k+1)
         }
       }
       #END: CASE 1
     }else{#CASE 2 arbitrary supports
-      if(sz!=size){stop("The sizes of SLOTS 'supp' and 'der' should match, the object needs correction.\n See 'Report' field in the output list, for more information.")}
+      if(sz!=size){stop("The sizes of SLOTS 'supp' and 'der' should match, the object needs correction.")}
       for(j in 1:size){#Running through all the splines in the object
           #In the condition on the RHS below the sum of all knots in the support set is evaluated and should match the number
           #of rows in 'der'.
           m=sum(object@supp[[j]][,2]-object@supp[[j]][,1]+1) #The total number of knots in the support
         if(prod(dim(object@der[[j]])==c(m,k+1))==0){
           is=FALSE
-          Report=paste(Report,"The partial support range case.\n")
-          Report=paste(Report,"SLOT 'der' do not have properly set the dimension for spline", j,"in the input 'Splinets' object.\n")
-          Report=paste(Report,"In the output object, it is set temporarily to the matrix of 'ones' with the proper dimension.\n\n")
+          cat("The partial support range case.\n")
+          cat("SLOT 'der' do not have properly set the dimension for spline", j,"in the input 'Splinets' object.\n")
+          cat("In the output object, it is set temporarily to the matrix of 'ones' with the proper dimension.\n\n")
           robject@der[[j]]=matrix(1,nrow=m,ncol=k+1)
         }
       }
@@ -223,10 +213,10 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
             CurrDer=robject@der[[j]]
             if(prod(abs(CurrDer[1,(1:k)])<rep(object@epsilon,k))==0 || prod(abs(CurrDer[dim(CurrDer)[1],(1:k)])<rep(object@epsilon,k))==0){
               is=FALSE
-              Report=paste(Report,"The boundary zero conditions are not satisfied for spline", j , "in the input 'Splinets' object.\n")
+              cat("The boundary zero conditions are not satisfied for spline", j , "in the input 'Splinets' object.\n")
               robject@der[[j]][1,(1:k)]=rep(0,k)
               robject@der[[j]][dim(CurrDer)[1],(1:k)]=rep(0,k)
-              Report=paste(Report,"Correction of the first and last rows of the derivative matrices are made in the output 'Splinets' object.\n")
+              cat("Correction of the first and last rows of the derivative matrices are made in the output 'Splinets' object.\n")
             }
           } #The end of verification of the boundary conditions
           #END: CASE 1
@@ -240,10 +230,10 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
               E=CurrSupp[l,2]-CurrSupp[l,1]+B
             if(prod(abs(CurrDer[B,(1:k)])<rep(object@epsilon,k))==0 || prod(abs(CurrDer[E,(1:k)])<rep(object@epsilon,k))==0){
               is=FALSE
-              Report=paste(Report,"The boundary zero conditions are not satisfied for spline", j , "in the input 'Splinets' object.\n")
+              cat("The boundary zero conditions are not satisfied for spline", j , "in the input 'Splinets' object.\n")
               robject@der[[j]][B,(1:k)]=rep(0,k)
               robject@der[[j]][E,(1:k)]=rep(0,k)
-              Report=paste(Report,"Correction of the first and last rows of the derivative matrices over the support component", l,"of spline", j,"in the output 'Splinets' object.\n")
+              cat("Correction of the first and last rows of the derivative matrices over the support component", l,"of spline", j,"in the output 'Splinets' object.\n")
             }
               B=E+1
            }
@@ -273,8 +263,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
       
       if(n %% 2 == 0){ #The even number of knots
         if(SL[l+2,k+1]!=SR[l+2,k+1]){
-          Report=paste(Report,"\nSpline", j,"'s highest derivative is not symmetrically defined at the center (the values at the two central knots should be equal).\n")
-          Report=paste(Report,"Spline", j,"'s highest derivative values at the two central knots have been made equal by averaging the two central values in SLOT 'der'.\n")
+          cat("\nSpline", j,"'s highest derivative is not symmetrically defined at the center (the values at the two central knots should be equal).\n")
+          cat("Spline", j,"'s highest derivative values at the two central knots have been made equal by averaging the two central values in SLOT 'der'.\n")
           is=FALSE
           robject@der[[j]][(l+2),k+1]=(SL[l+2,k+1]+SR[l+2,k+1])/2  #Correcting values at the center
           robject@der[[j]][(l+1),k+1]=robject@der[[j]][(l+2),k+1]
@@ -283,8 +273,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
         }
       }else{ #The odd number of knots
         if((SL[l+2,k+1])^2+(SR[l+2,k+1])^2!=0){
-          Report=paste(Report,"\nSpline", j,"'s highest derivative at the central knot is not equal to zero.\n")
-          Report=paste(Report,"Spline", j,"'s highest derivative value at the central knot has been made equal to zero.\n")
+          cat("\nSpline", j,"'s highest derivative at the central knot is not equal to zero.\n")
+          cat("Spline", j,"'s highest derivative value at the central knot has been made equal to zero.\n")
           is=FALSE
           SL[l+2,k+1]=0
           SR[l+2,k+1]=0
@@ -298,13 +288,13 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
         
         if(sqrt(Er1/(n*k))>object@epsilon){
           is=FALSE
-          Report=paste(Report,"\nThe matrix of derivatives at the knots for spline", j, "does not satisfy the conditions \n
+          cat("\nThe matrix of derivatives at the knots for spline", j, "does not satisfy the conditions \n
           required for a spline (up to the accuracy SLOT 'epsilon').\n
           One of the reasons can be that SLOT 'taylor' is not correctly given.\n")
-          Report=paste(Report,"The computed standard error per matrix entry is", sqrt(Er1/(n*k)), ".\n\n")
+          cat("The computed standard error per matrix entry is", sqrt(Er1/(n*k)), ".\n\n")
           #Recomputing the matrix of the derivative using RRM method 
             robject@der[[j]]=correct(robject@der[[j]],robject@taylor)  
-            Report=paste(Report,"\nThe output object Spline", j," has the derivative matrix corrected by the RRM method\n given that SLOT 'taylor' is properly given.")
+          cat("\nThe output object Spline", j," has the derivative matrix corrected by the RRM method\n given that SLOT 'taylor' is properly given.")
         }
       }
       #END: CASE 1
@@ -332,8 +322,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
           
           if(m %% 2 == 0){ #The even number of knots
             if(SL[L+2,k+1]!=SR[L+2,k+1]){
-              Report=paste(Report,"\nSpline", j,", support", l,"'s highest derivative is not symmetrically defined at the center (the values at the two central knots should be equal).\n")
-              Report=paste(Report,"Spline", j," highest, support", l,"'s derivative values at the two central knots have been made equal by averaging the two central values in SLOT 'der'.\n")
+              cat("\nSpline", j,", support", l,"'s highest derivative is not symmetrically defined at the center (the values at the two central knots should be equal).\n")
+              cat("Spline", j," highest, support", l,"'s derivative values at the two central knots have been made equal by averaging the two central values in SLOT 'der'.\n")
               is=FALSE
               robject@der[[j]][(B+L+1),k+1]=(SL[L+2,k+1]+SR[L+2,k+1])/2  #Correcting values at the center
               robject@der[[j]][(B+L),k+1]=robject@der[[j]][(B+L+1),k+1]
@@ -342,8 +332,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
             }
           }else{ #The odd number of knots
             if((SL[L+2,k+1])^2+(SR[L+2,k+1])^2!=0){
-              Report=paste(Report,"\nSpline", j,"support", l,"'s highest derivative at the central knot is not equal to zero.\n")
-              Report=paste(Report,"Spline", j,"support", l,"'s highest derivative value at the central knot has been made equal to zero.\n")
+              cat("\nSpline", j,"support", l,"'s highest derivative at the central knot is not equal to zero.\n")
+              cat("Spline", j,"support", l,"'s highest derivative value at the central knot has been made equal to zero.\n")
               is=FALSE
               SL[L+2,k+1]=0
               SR[L+2,k+1]=0
@@ -355,11 +345,11 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
           Er=Er+Er1 #Adding the error for the j-th spline to the total error over all splines
           if(sqrt(Er1/(m*k))>object@epsilon){
             is=FALSE
-            Report=paste(Report,"\nThe matrix of derivatives at the knots for spline", j, ", support", l," does not satisfy the conditions that are required for a spline (up to the accuracy SLOT 'epsilon').\n")
-            Report=paste(Report,"The computed standard error per matrix entry is", sqrt(Er1/(m*k)), ".\n\n")
+            cat("\nThe matrix of derivatives at the knots for spline", j, ", support", l," does not satisfy the conditions that are required for a spline (up to the accuracy SLOT 'epsilon').\n")
+            cat("The computed standard error per matrix entry is", sqrt(Er1/(m*k)), ".\n\n")
             #Recomputing the matrix of the derivative using RRM method 
             robject@der[[j]][B:E,]=correct(robject@der[[j]][B:E,],robject@taylor)  
-            Report=paste(Report,"\nThe output object Spline", j," support", l,"has the derivative matrix corrected by the RRM method.")
+            cat("\nThe output object Spline", j," support", l,"has the derivative matrix corrected by the RRM method.")
           }
           B=E+1
           }#the end of the loop over the support intervals
@@ -377,8 +367,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
             
             if(n %% 2 == 0){ #The even number of knots
               if(SL[l+2,k+1]!=SR[l+2,k+1]){
-                Report=paste(Report,"\nSpline", j,"'s highest derivative is not symmetrically defined at the center (the values at the two central knots should be equal).\n")
-                Report=paste(Report,"The spline", j,"'ths highest derivative at the two central knots has been made equal by averaging SLOT 'der'.\n")
+                cat("\nSpline", j,"'s highest derivative is not symmetrically defined at the center (the values at the two central knots should be equal).\n")
+                cat("The spline", j,"'ths highest derivative at the two central knots has been made equal by averaging SLOT 'der'.\n")
                 is=FALSE
                 robject@der[[j]][(l+2),k+1]=(SL[l+2,k+1]+SR[l+2,k+1])/2  #Correcting values at the center
                 robject@der[[j]][(l+1),k+1]=robject@der[[j]][(l+2),k+1]
@@ -387,8 +377,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
               }
             }else{ #The odd number of knots
               if((SL[l+2,k+1])^2+(SR[l+2,k+1])^2!=0){
-                Report=paste(Report,"\n The spline", j,"'ths highest derivative at the central knot is zero.\n")
-                Report=paste(Report,"Now it is set to zero.\n")
+                cat("\n The spline", j,"'ths highest derivative at the central knot is zero.\n")
+                cat("Now it is set to zero.\n")
                 is=FALSE
                 SL[l+2,k+1]=0
                 SR[l+2,k+1]=0
@@ -406,11 +396,11 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
             Er=Er+Er1 #Adding the error for the j-th spline to the total error over all splines
             if(sqrt(Er1/(n*k))>object@epsilon){
               is=FALSE
-              Report=paste(Report,"\nThe derivative matrix for spline", j, "does not satisfy the smoothness conditions (up to the accuracy SLOT 'epsilon').\n")
-              Report=paste(Report,"The standard error per matrix entry is", sqrt(Er1/(n*k)), ".\n\n")
+              cat("\nThe derivative matrix for spline", j, "does not satisfy the smoothness conditions (up to the accuracy SLOT 'epsilon').\n")
+              cat("The standard error per matrix entry is", sqrt(Er1/(n*k)), ".\n\n")
               #Recomputing the matrix of the derivative using RRM method 
               robject@der[[j]]=correct(robject@der[[j]],robject@taylor)  
-              Report=paste(Report,"\nThe output object has the derivative matrix corrected by the RRM method.\n")
+              cat("\nThe output object has the derivative matrix corrected by the RRM method.\n")
             }
           }  
           #END: CASE 3
@@ -433,8 +423,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
               
               if(m %% 2 == 0){ #The even number of knots
                 if(SL[L+2,k+1]!=SR[L+2,k+1]){
-                  Report=paste(Report,"\nSpline", j,", support", l," - highest derivative is not symmetric at the center (equal values at the two central knots).\n")
-                  Report=paste(Report,"The two values have been made equal by averaging.\n")
+                  cat("\nSpline", j,", support", l," - highest derivative is not symmetric at the center (equal values at the two central knots).\n")
+                  cat("The two values have been made equal by averaging.\n")
                   is=FALSE
                   robject@der[[j]][(B+L+1),k+1]=(SL[L+2,k+1]+SR[L+2,k+1])/2  #Correcting values at the center
                   robject@der[[j]][(B+L),k+1]=robject@der[[j]][(B+L+1),k+1]
@@ -443,8 +433,8 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
                 }
               }else{ #The odd number of knots
                 if((SL[L+2,k+1])^2+(SR[L+2,k+1])^2!=0){
-                  Report=paste(Report,"\nSpline", j,"support", l,"'s highest derivative at the central knot is not zero.\n")
-                  Report=paste(Report,"Now it is set to zero.\n")
+                  cat("\nSpline", j,"support", l,"'s highest derivative at the central knot is not zero.\n")
+                  cat("Now it is set to zero.\n")
                   is=FALSE
                   SL[L+2,k+1]=0
                   SR[L+2,k+1]=0
@@ -462,11 +452,11 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
               Er=Er+Er1 #Adding the error for the j-th spline to the total error over all splines
               if(sqrt(Er1/(m*k))>object@epsilon){
                 is=FALSE
-                Report=paste(Report,"\nThe matrix of derivatives at the knots for spline", j, ", support", l," does not satisfy the splie conditions (up to the accuracy set in SLOT 'epsilon').\n")
+                cat("\nThe matrix of derivatives at the knots for spline", j, ", support", l," does not satisfy the splie conditions (up to the accuracy set in SLOT 'epsilon').\n")
                 cat("The computed standard error per matrix entry is", sqrt(Er1/(m*k)), ".\n\n")
                 #Recomputing the matrix of the derivative using RRM method 
                 robject@der[[j]][B:E,]=correct(robject@der[[j]][B:E,],robject@taylor[CurrSupp[l,1]:(CurrSupp[l,2]-1),])  
-                Report=paste(Report,"\nThe output object Spline", j," support", l,"has the derivative matrix corrected by the RRM method.")
+                cat("\nThe output object Spline", j," support", l,"has the derivative matrix corrected by the RRM method.")
               }
               B=E+1
             }#the end of the loop over the support intervals
@@ -478,14 +468,9 @@ Ordered  knots with removed ties are given in the output `Splinets' object.\n")
   } #The end of the non-zero smoothness order.
     #End of PART III - the main condtions for the matrices
 
-    issp=list(is,robject,Er,Report)
-    names(issp)=c("is","robject","Er","Report")
-    if(is==TRUE){
-      message("\n The input object is a 'Splinets' object.")
-    }else{
-        message("\n The input object is not a 'Splinets' object.\n See 'Report' field in the output list, for more information.")
-      }
-    return(invisible(issp))     
+    issp=list(is,robject,Er)
+    names(issp)=c("is","robject","Er")
+    return(issp)     
 
  } #The end of the method function
 ) #The end of the method

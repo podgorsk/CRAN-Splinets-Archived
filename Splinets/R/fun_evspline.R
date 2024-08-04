@@ -38,7 +38,7 @@ evspline = function(object, sID = NULL, x = NULL, N = 250){
     supp = rep(list(matrix(c(1,n+2), ncol = 2)), l)
   }
   
-  if(is.null(sID)) sID = 1:l
+  if(is.null(sID)) sID = 1:l #all splines from the input
   
   r = range(xi) 
   if(is.null(x)){

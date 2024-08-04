@@ -32,10 +32,8 @@ nspl=construct(xi,k,SS3,supp[3,])
 spl=gather(spl,nspl) #the third is added
 
 der_spl = deriva(spl)
-oldpar <- par(no.readonly = TRUE)
 par(mar=c(1,1,1,1))
 par(mfrow=c(2,1))
 plot(der_spl)
 plot(spl)
 par(mfrow=c(1,1))
-par(oldpar)

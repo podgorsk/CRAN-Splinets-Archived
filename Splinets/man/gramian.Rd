@@ -43,10 +43,13 @@ In the case of two input \code{Splinets}-objects, they should be over the same s
 }
 \section{References}{
 
-Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2019) "Splinets -- efficient orthonormalization of the B-splines."  <arXiv:1910.07341>.
+Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. "Dyadic diagonalization of positive definite band matrices and efficient B-spline orthogonalization." Journal of Computational and Applied Mathematics (2022) <https://doi.org/10.1016/j.cam.2022.114444>.
+
 
 Podg\eqn{\mbox{\'o}}{o}rski, K. (2021) 
 "\code{Splinets} -- splines through the Taylor expansion, their support sets and orthogonal bases." <arXiv:2102.00733>.
+
+ Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2023) "Splinets 1.5.0 -- Periodic Splinets." <arXiv:2302.07552>
 }
 
 \examples{

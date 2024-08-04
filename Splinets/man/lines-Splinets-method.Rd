@@ -13,19 +13,18 @@
 
 \item{...}{other standard graphical parameters;}
 }
-\value{
-No return values, the effect are lines (graphs) visualizing a Splinet object added to the current plot. 
-The entire set of splines is displayed in the plot.
-}
 \description{
 A standard method of adding splines to an existing plot.
 }
 \section{References}{
 
-Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2019) "Splinets -- efficient orthonormalization of the B-splines."  <arXiv:1910.07341>.
+Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. "Dyadic diagonalization of positive definite band matrices and efficient B-spline orthogonalization." Journal of Computational and Applied Mathematics (2022) <https://doi.org/10.1016/j.cam.2022.114444>.
+
 
 Podg\eqn{\mbox{\'o}}{o}rski, K. (2021) 
 "\code{Splinets} -- splines through the Taylor expansion, their support sets and orthogonal bases." <arXiv:2102.00733>.
+
+ Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2023) "Splinets 1.5.0 -- Periodic Splinets." <arXiv:2302.07552>
 }
 
 \examples{

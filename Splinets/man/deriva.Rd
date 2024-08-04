@@ -23,10 +23,13 @@ the support sets by excluding regions over which the original function is consta
 }
 \section{References}{
 
-Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2019) "Splinets -- efficient orthonormalization of the B-splines."  <arXiv:1910.07341>.
+Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. "Dyadic diagonalization of positive definite band matrices and efficient B-spline orthogonalization." Journal of Computational and Applied Mathematics (2022) <https://doi.org/10.1016/j.cam.2022.114444>.
+
 
 Podg\eqn{\mbox{\'o}}{o}rski, K. (2021) 
 "\code{Splinets} -- splines through the Taylor expansion, their support sets and orthogonal bases." <arXiv:2102.00733>.
+
+ Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2023) "Splinets 1.5.0 -- Periodic Splinets." <arXiv:2302.07552>
 }
 
 \examples{
@@ -64,13 +67,11 @@ nspl=construct(xi,k,SS3,supp[3,])
 spl=gather(spl,nspl) #the third is added
 
 der_spl = deriva(spl)
-oldpar <- par(no.readonly = TRUE)
 par(mar=c(1,1,1,1))
 par(mfrow=c(2,1))
 plot(der_spl)
 plot(spl)
 par(mfrow=c(1,1))
-par(oldpar)
 }
 \seealso{
 \code{\link{integra}} for generating the indefinite integral of a spline that can be viewed 

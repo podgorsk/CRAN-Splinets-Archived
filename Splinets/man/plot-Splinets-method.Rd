@@ -22,29 +22,31 @@
 
 \item{sID}{vector, specifying indices of the splines to be plotted;}
 
-\item{vknots}{logic, indicates if auxiliary vertical lines will be addef to highlight the positions of knots; The default is \code{TRUE}.}
+\item{vknots}{logic, indicates if auxiliary vertical lines will be added to highlight the positions of knots; The default is \code{TRUE}.}
 
 \item{type}{string, controls the layout of graphs; The following options are available
 \itemize{
   \item \code{"stnd"} -- if \code{object@type="dspnt"} or \code{="spnt"}, then the plots are over 
   the dyadic net of supports, other types of the bases are on a single plot with information about 
-  the basis,
-  \item \code{"simple"} -- all the objects are ploted in a single plot,
-  \item \code{"dyadic"} -- if not \code{object@type="sp"}, then the plot is over the dyadic net of supports.
+  the basis printed out,
+  \item \code{"simple"} -- all the objects are plotted in a single plot,
+  \item \code{"dyadic"} -- if \code{object@type="sp"} is not true (unstructured collection of splines), 
+  then the plot is over the dyadic net of supports.
 }}
 
-\item{mrgn}{number, specyfying the margin size in the dydadic structure plot;}
+\item{mrgn}{number, specifying the margin size in the dyadic structure plot;}
 
 \item{lwd}{positive integer, the line width;}
 
 \item{...}{other standard graphical parameters can be passed;}
 }
 \value{
-No return values, the effect is a plot visualizing a Splinet object. 
-The entire set of splines is displayed in a single plot.
+A plot visualizing a Splinet object. The entire set of splines will 
+be displayed in a plot.
 }
 \description{
-The method provides graphical visualization of a \code{Splinets}-class object.
+The method provides graphical visualization of a \code{Splinets}-class object. The method plot a
+\code{Splinets} in a cartesian or a polar coordinate if it is a regular splines or a periodic splines, respectively.
 }
 \details{
 The standard method of plotting splines in a \code{Splinet}-object. 
@@ -55,10 +57,13 @@ Most of the standard graphical parameters can be passed to this function.
 }
 \section{References}{
 
-Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2019) "Splinets -- efficient orthonormalization of the B-splines."  <arXiv:1910.07341>.
+Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. "Dyadic diagonalization of positive definite band matrices and efficient B-spline orthogonalization." Journal of Computational and Applied Mathematics (2022) <https://doi.org/10.1016/j.cam.2022.114444>.
+
 
 Podg\eqn{\mbox{\'o}}{o}rski, K. (2021) 
 "\code{Splinets} -- splines through the Taylor expansion, their support sets and orthogonal bases." <arXiv:2102.00733>.
+
+ Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2023) "Splinets 1.5.0 -- Periodic Splinets." <arXiv:2302.07552>
 }
 
 \examples{
@@ -82,7 +87,7 @@ nspl=construct(xi,k,SS3,supp[[3]],'CRLC')
 spl=gather(spl,nspl) #the third is added
 
 plot(spl)
-plot(spl,sID=c(1,3))
+  plot(spl,sID=c(1,3))
 plot(spl,sID=2)
 t = seq(0,0.5,length.out = 1000)
 plot(spl, t, sID = 1)
@@ -97,9 +102,20 @@ RS=rspline(spl,5)
 plot(RS,main="Random splines around the mean spline",ylim=3*range(spl@der[[1]][,1]) )
 lines(spl,col='red',lwd=4,lty=2)
 
+#Periodic splines
+xi = seq(0, 1, length.out = 25)
+so = splinet(xi, periodic = TRUE) 
+
+plot(so$bs)
+plot(so$os)
+plot(so$bs,type= "dyadic")
+plot(so$bs, sID=c(4,6))
+plot(so$os, type="simple",sID=c(4,6))
+
+
 }
 \seealso{
 \code{\link{evspline}} for manually evaluating splines in a \code{Splinet}-object;
 \code{\link{Splinets-class}} for the definition of the \code{Splinet}-class;
-\code{\link{lines,Splinets-method}} for adding graphs to exisiting plots;
+\code{\link{lines,Splinets-method}} for adding graphs to existing plots;
 }

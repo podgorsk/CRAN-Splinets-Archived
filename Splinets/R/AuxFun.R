@@ -34,10 +34,10 @@ correct=function(S,Vd,method='RRM'){
   #Checking boundary conditions
   if(k>0){ #There are no boundary condtions in the zero order case.
     if(prod(S[1,(1:k)]==rep(0,k))==0 || prod(S[dim(S)[1],(1:k)]==rep(0,k))==0){
-      #cat("The zero boundary conditions are not satisfied.\n")
+      cat("The zero boundary conditions are not satisfied.\n")
       SS[1,(1:k)]=rep(0,k)
       SS[dim(SS)[1],(1:k)]=rep(0,k)
-      #cat("The correction of the first and last rows of the derivative matrix has been made.\n\n")
+      cat("The correction of the first and last rows of the derivative matrix has been made.\n\n")
     }
   } #The end of verification of the boundary derivative matrices
 
@@ -45,17 +45,17 @@ correct=function(S,Vd,method='RRM'){
   #Verification of the conditions at the center of the derivative matrices
   if(n %% 2 == 0){
     if(S[l+2,k+1]!=S[l+1,k+1]){
-       # cat("\nThe highest order derivative is not symmetrically defined at the center.
-       #    The values at the two central knots should be equal.\n")
-       # cat("The highest order derivative values at the two central knots
-       #    have been made equal by averaging the two central values.\n")
+      cat("\nThe highest order derivative is not symmetrically defined at the center.
+          The values at the two central knots should be equal.\n")
+      cat("The highest order derivative values at the two central knots
+          have been made equal by averaging the two central values.\n")
       SS[(l+2),k+1]=(S[l+2,k+1]+S[l+1,k+1])/2  #Correcting values at the center
       SS[l+1,k+1]=SS[(l+2),k+1]
     }
   }else{
     if((S[l+2,k+1])^2!=0){
-      # cat("\nThe highest order derivative at the central knot is not equal to zero.\n")
-      # cat("It has been made equal to zero now.\n")
+      cat("\nThe highest order derivative at the central knot is not equal to zero.\n")
+      cat("It has been made equal to zero now.\n")
       SS[l+2,(k+1)]=0
     }
   }
@@ -139,9 +139,9 @@ correct=function(S,Vd,method='RRM'){
       AR=AAR[(l-k+1):(l+1),]
     }
     
-#    cat('\nCorrection of the LHS part of the matrix')
+    cat('\nCorrection of the LHS part of the matrix')
     SL[(l-k+1):(l+2),]=frlr(SL[(l-k+1),],SL[(l+2),],AL,neqknots=k)
-#    cat('\nCorrection of the RHS part of the matrix')
+    cat('\nCorrection of the RHS part of the matrix')
     SR[(l-k+1):(l+2),]=frlr(SR[(l-k+1),],SR[(l+2),],AR,neqknots=k)
 
     #Puting the output from the computed pieces
@@ -185,9 +185,9 @@ correct=function(S,Vd,method='RRM'){
       if(dim(AR)[1]!=1){
         AR=AAR[(l-k+1):(l+1),,drop = FALSE]
       }
-#      cat('\nCorrection of the LHS part of the matrix')
+      cat('\nCorrection of the LHS part of the matrix')
       SL[(l-k+1):(l+2),]=frlr(SL[(l-k+1),],SL[(l+2),],AL,neqknots=k)
-#      cat('\nCorrection of the RHS part of the matrix')
+      cat('\nCorrection of the RHS part of the matrix')
       SR[(l-k+1):(l+2),]=frlr(SR[(l-k+1),],SR[(l+2),],AR,neqknots=k)
 
       #Puting the output from the computed pieces
@@ -221,7 +221,7 @@ correct=function(S,Vd,method='RRM'){
           if((dim(AAL)[1])!=1){
             AL=AAL[(1+(r-1)*(k+1)):(r*(k+1)),]
           }
-#          cat('\nCorrection of the LHS part of the matrix')
+          cat('\nCorrection of the LHS part of the matrix')
           SL[(1+(r-1)*(k+1)):(1+r*(k+1)),]=frlr(FR,LR,AL,neqknots=k)
 
           FR=SR[(1+(r-1)*(k+1)),]
@@ -229,7 +229,7 @@ correct=function(S,Vd,method='RRM'){
           if((dim(AAR)[1])!=1){
             AR=AAR[(1+(r-1)*(k+1)):(r*(k+1)),]
           }
-#          cat('\nCorrection of the RHS part of the matrix')
+          cat('\nCorrection of the RHS part of the matrix')
           SR[(1+(r-1)*(k+1)):(1+r*(k+1)),]=frlr(FR,LR,AR,neqknots=k)
 
         }
@@ -243,7 +243,7 @@ correct=function(S,Vd,method='RRM'){
         if((dim(AAL)[1])!=1){
           AL=AAL[(j*(k+1)+1):(l-k),]
         }
-#        cat('\nCorrection of the LHS part of the matrix')
+        cat('\nCorrection of the LHS part of the matrix')
         SL[(j*(k+1)+1):(l-k+1),]=frlr(FR,LR,AL,neqknots=(l-(k+1)*(j+1)))
 
         FR=SR[j*(k+1)+1,]
@@ -251,7 +251,7 @@ correct=function(S,Vd,method='RRM'){
         if((dim(AAR)[1])!=1){
           AR=AAR[(j*(k+1)+1):(l-k),]
         }
-#        cat('\nCorrection of the RHS part of the matrix')
+        cat('\nCorrection of the RHS part of the matrix')
         SR[(j*(k+1)+1):(l-k+1),]=frlr(FR,LR,AR,neqknots=(l-(k+1)*(j+1)))
 
       }
@@ -263,9 +263,9 @@ correct=function(S,Vd,method='RRM'){
       if(dim(AAR)[1]!=1){
         AR=AAR[(l-k+1):(l+1),]
       }
-#      cat('\nCorrection of the LHS part of the matrix')
+      cat('\nCorrection of the LHS part of the matrix')
       SL[(l-k+1):(l+2),]=frlr(SL[(l-k+1),],SL[(l+2),],AL,neqknots=k)
-#      cat('\nCorrection of the RHS part of the matrix')
+      cat('\nCorrection of the RHS part of the matrix')
       SR[(l-k+1):(l+2),]=frlr(SR[(l-k+1),],SR[(l+2),],AR,neqknots=k)
 
       #Puting the output from the computed pieces
@@ -501,7 +501,7 @@ typeWords = function(t, w = TRUE){
     "dyadic splinet\n", "not fully dyadic splinet\n", "splines\n"
   )
   size = c(
-    "basis functions\n", rep("othrogonal bases\n", 4), "spline functions\n"
+    "basis functions\n", rep("orthogonal splines\n", 4), "spline functions\n"
   )
   if(w){
     res = words[which(type == t)]
@@ -972,12 +972,14 @@ inner_engine = function(der1, der2, supp1, supp2, FF, D, n, k){
   }
   return(res)
 }
-
+#The following function evaluates an n+1 x k+1 matrix
+#FF_{r,j} dxi_r^(j-1/2)/(j-1)!, r=1,...,n+1; j=1,...,k+1, this matrix appears in the arkiv paper
+#on splinets, but in the other R-paper on the arkiv there is a mistake in Proposition 3. 
 FF_Matrix <- function(knots, k){
   n = length(knots) - 2
   FF=matrix(0,ncol=k+1,nrow=n+1)
   df_xi=as.matrix(diff(knots))
-  FF[,1]=sqrt(df_xi)
+  FF[,1]=sqrt(df_xi) #see the formula on the splinets
   for(j in 1:k){FF[,j+1]=FF[,j]*df_xi/j}
   return(FF)
 }
@@ -993,24 +995,33 @@ FF_Matrix <- function(knots, k){
 bandmatrix = function(xi, k, S, supp){
   n_so = length(S)
   H = diag(n_so)
-  FF = FF_Matrix(xi, k)
-  D = as.matrix(1/1:(2*k+1))
+  n = length(xi) - 2
+  FF = FF_Matrix(xi, k) #according to the formula on the inner product in the original arkiv paper
+  D = as.matrix(1/(1:(2*k+1)))
   for(i in 1:n_so){
     S[[i]] = sym2one(S[[i]], supp[[i]])
   }
+  if(n_so-k>0){# it may happen that n_so-k=0: we have on one group on one level
   for(i in 1:(n_so-k)){
     for(j in (i+1):(i+k)){
-      H[i,j] = H[j,i] = inner_engine(der1 = S[[i]], der2 = S[[j]],
-                                     supp1 = supp[[i]], supp2 = supp[[j]],
-                                     FF = FF, D = D, n = n_so+k-1, k = k)
+     # H[i,j] = H[j,i] = inner_engine(der1 = S[[i]], der2 = S[[j]],
+     #                                supp1 = supp[[i]], supp2 = supp[[j]],
+     #                               FF = FF, D = D, n = n_so+k-1, k = k)
+       H[i,j] = H[j,i] = inner_engine(der1 = S[[i]], der2 = S[[j]],
+                               supp1 = supp[[i]], supp2 = supp[[j]],
+                               FF = FF, D = D, n = n, k = k)
     }
   }
+}
   if(k != 1){
     for(i in (n_so-k+1):(n_so-1)){
       for(j in (i+1):n_so){
+        #H[i,j] = H[j,i] = inner_engine(der1 = S[[i]], der2 = S[[j]],
+        #                               supp1 = supp[[i]], supp2 = supp[[j]],
+        #                               FF = FF, D = D, n = n_so+k-1, k = k)
         H[i,j] = H[j,i] = inner_engine(der1 = S[[i]], der2 = S[[j]],
-                                       supp1 = supp[[i]], supp2 = supp[[j]],
-                                       FF = FF, D = D, n = n_so+k-1, k = k)
+                                        supp1 = supp[[i]], supp2 = supp[[j]],
+                                       FF = FF, D = D, n = n, k = k)
       }
     }
   }
@@ -1448,7 +1459,7 @@ aug_bound = function(n_so, k){
 # k: smorder
 # return: a matrix, from left to right, each column present 
 #   1) 'Seq_ID': the sequential id
-#   2) 'supp_level': the support level, or resolution
+#   2) 'supp_level': the support level, the top of the dyadic structure corresponds to the smallest level (1)
 #   3) 'tuplet_ID': the id of tuplet where the function stay (relatively to the fully dyadic structure).
 #   4) 'basis_ID': the id of basis element within tuplet
 net_structure = function(n_so, k){
@@ -1501,10 +1512,6 @@ plot.spline = function(object, x = NULL, sID = NULL, vknots=TRUE, mrgn=2, type='
   if(is.null(ylim)){
     ylim = range(Val)
   }
-  
-  oldpar <- par(no.readonly = TRUE) # this is recommended to keep after executing the function
-  on.exit(par(oldpar)) # the graphical paramaters as they were before entering the function
-  
   par(mar = c(mrgn, 2*mrgn, mrgn, 2*mrgn))
   plot(Arg,Val[,1],type=type,bty=bty,col=col,xlim=xlim,ylim=ylim,
        xlab=xlab,ylab=ylab,lty=lty,lwd=lwd,...)
@@ -1590,26 +1597,19 @@ plot.splinet = function(object,lwd=2,mrgn=2){
   ourcol=c('deepskyblue4', 'darkorange3', 'goldenrod', 'darkorchid4',
            'darkolivegreen4', 'deepskyblue', 'red4', 'slateblue')
   # margin_height = 3
-  oldpar <- par(no.readonly = TRUE) # this is recommended to keep after executing the function
-  on.exit(par(oldpar)) # the graphical paramaters as they were before entering the function
   par(mar = c(mrgn, 2*mrgn, mrgn, 2*mrgn))
   net_str = net_structure(n-k+1, k)
   n_level = max(net_str[, 2])
   layout(matrix(1:n_level, n_level, 1))
   
-  iftitle = TRUE
+  
   for(i in 1:n_level){
     seqID = net_str[which(net_str[,2] == i), 1]
     
-    if(iftitle){
       plot(y[, 1], y[, seqID[1]+1], type = "l", ylab = "", bty = "n",
            ylim = range(y[, seqID+1]), xlab = "", col = ourcol[seqID[1]%%8+1], lwd = lwd,
            main = paste(numToWord(k), "order splinet basis" )) 
-      iftitle = FALSE
-    } else{
-      plot(y[, 1], y[, seqID[1]+1], type = "l", ylab = "", bty = "n",
-           ylim = range(y[, seqID+1]), xlab = "", col = ourcol[seqID[1]%%8+1], lwd = lwd, main = "") 
-    }
+    
     for(j in seqID[-1]){
       points(y[, 1], y[, j+1], type = "l", col = ourcol[j%%8+1], lwd = lwd) 
     }
@@ -1743,6 +1743,7 @@ innerdb = function(fdata,basis){
   k = basis@smorder
   supp = basis@supp #it must be a 1 x 2 matrix form, not a vector
   S = basis@der
+  n_basis=length(S)
   newS = S #the list to keep the new entries of the matrices of the derivatives for integral
   
   taylor = basis@taylor
@@ -1754,14 +1755,15 @@ innerdb = function(fdata,basis){
   y=fdata[,-1,drop=FALSE]
   
   #the matrix for the result:
-  A=matrix(0,N,n-k+1) #n here counts only the internal knots
-  
+ # A=matrix(0,N,n-k+1) #n here counts only the internal knots
+  A=matrix(0,N,n_basis) #n here counts only the internal knots
+ 
   
   #####
   #the main part
   ####
-  for(i in 1:(n-k+1)){#looping through the elements of the basis
-    
+  #for(i in 1:(n-k+1)){#looping through the elements of the basis
+  for(i in 1:(n_basis)){#looping through the elements of the basis 
     #the discretized data are treated as a function that between the two subsequentive arguments takes the RHS value
     rangeknots=xi[c(supp[[i]][1,1],supp[[i]][1,2])]
     ind_in_range=(x<rangeknots[2]) & (x>=rangeknots[1]) #indexes in the arguments that the values of the piecewise 
@@ -1810,3 +1812,620 @@ innerdb = function(fdata,basis){
 #   
 #   return(A)
 # }
+
+
+#####
+
+#----------------------------------------------#
+#----- Sec 14 Auxfun for periodic Splinet -----#
+#----------------------------------------------#
+
+
+
+# function used in periodic splinets for generating a small interval cosists of the last k knots
+# of the set of knots xi and k extra knots that preserves the distanse of the first k knots of 
+# the set xi.
+# @param xi numeric \code{n+2} vector, a vector of n+2 knot locations presented in the increasing order and without ties.
+# @param k non-negative integer, the smoothnes order of the splines, i.e. the highest order of non-zero derivative. 
+
+# @return numeric \code{2k} vector, a vector of 2k knot consists of the first and the last k knots of xi.
+
+# @return numeric \code{2k} vector, a vector of 2k knot consists of the first and the last k knots of xi.
+
+extraknots=function(xi, k = 3){
+  diff=diff(xi)
+  l=length(xi)
+  xi=xi[l]
+  for (i in 1:k) {
+    xi=append(xi, max(xi)+ diff[i])
+    xi=append(min(xi)-diff[l-i],xi)
+  }
+  return(xi)
+  
+}
+
+
+# plot splines in polar coordinate
+# 
+# First, two polar coordingat plotting functions mimicking those 
+#in the cartesian coordinates
+polar_plot=function(theta,r,asp = 1,axes=F,xlab='',ylab='',type='l',zoom=1, ...){
+  x=r*cos(theta)
+  y=r*sin(theta)
+  M=max(r)
+  plot(x,y,asp = 1,axes=F,xlab='',ylab='',type=type, xlim=c(-M,M),ylim=c(-zoom*M,zoom*M), ...)
+}
+polar_lines=function(theta,r, ...){
+  x=r*cos(theta)
+  y=r*sin(theta)
+  lines(x,y, ...)
+}
+#
+
+#######################
+# x - represents the points on interval [0,1] where splines will be evaluated for the plots
+# sID - the indicies of the input splines to be plotted
+
+plot.spline.p=function(object, x = NULL, sID = NULL, vknots=T, ...){
+
+  if(length(sID) == 0){#if the indices of the splines are not specified
+    sID=1:length(object@der)
+  }
+  Nsp=length(sID)
+  n_so = length(object@der)
+  xi = object@knots
+  k = object@smorder
+  n = length(xi)-2
+  if(length(x)==0){
+    x= (1/360)*seq(0,360, by = 1) #Change from degrees to interval [0,1]
+  }
+  
+  y = evspline(object,x, sID = sID)
+  y=y[,-1,drop=F]
+  ourcol=c('deepskyblue4', 'darkorange3', 'goldenrod', 'darkorchid4',
+           'darkolivegreen4', 'deepskyblue', 'red4', 'slateblue')
+  
+  l=dim(y)[2]
+  M=max(y)
+  a=log(2)/M
+  c=rep(2, length(t))
+  
+  
+  #entering the first functional datum (we change the argument to radians)
+  polar_plot( 2*pi*x, exp(a*y[,1]), type="l",  col = ourcol[1%%8+1], zoom=exp(a*M)/exp(a*max(y[,1])), ...)
+  #also scaling to match the scale with the largest value in all data in y
+  
+  #entering the remaining functional data
+  if(l>1){
+    for (i in 2:l) {
+      polar_lines(2*pi*x, exp(a*y[,i]), type="l",  col = ourcol[i%%8+1], ...)
+    } 
+  }
+  
+  ####### Auxilary plotting
+  #Plotting circles at the zero level, the maximal level, and the minimal level
+  polar_lines(c(0,0),c(0,2),lty=1,col='black')
+  one=rep(1, length(x))
+  two=rep(2, length(x))
+  
+  polar_lines(2*pi*x, one, lty=1,col="black") #The circle at the level zero
+  graphics::text(1+0.1,0.1,labels=0)
+  polar_lines(2*pi*x, two, lty=3,col="black") #The circle at the level M
+  graphics::text(2.1,0.1,labels=signif(M,3))
+  m=min(y)
+  polar_lines(2*pi*x, rep(exp(a*m),length(x)), lty=3,col="black") #The circle at the level m
+  graphics::text(exp(a*m)-0.1,0.1,labels=signif(m,2))
+  
+  #Plotting the dashed lines at the knot locations
+  if(vknots==TRUE)
+  {
+    tt=2*pi*object@knots
+    for(i in 1:length(tt)){
+      polar_lines(c(tt[i],tt[i]),c(0,2),lty=3,col='black')
+    } 
+  }
+  #the end of knot plotting
+  ###### End Auxilary plotting
+}
+
+
+#######
+## Plotting bases of periodic splines
+#######################
+# x - represents the points on interval [0,1] where splines will be evaluated for the plots
+# sID - the indicies of the input splines to be plotted
+######
+plot.splinet.p = function(object, x = NULL, sID = NULL, vknots=TRUE, type='l', bty="n",col='deepskyblue4',
+                          lty=1, lwd=2, xlim=NULL, ylim = NULL, xlab="", ylab = "", ...){
+  
+  if(length(x) == 1){
+    stop("x should not be a single value") # x - represent values at which the splines are 
+      #evaluated to create graphs  if NULL the equally spaced grid of 360 points is chosen.
+  }
+  if(length(x)==0){ #x==NULL case
+    x= (1/360)*seq(0,360, by = 1) #Change from degrees to interval [0,1]
+  }
+  
+  if(length(sID) == 0){#If the indices are not specified all elements are plotted 
+    sID=1:length(object@der) #the number of all input spline
+  }
+  Nsp=length(sID)
+  n_so = length(object@der)
+  xi = object@knots
+  k = object@smorder
+  n = length(xi)-2
+  y = evspline(object,x=x) #Here the values for plots are evaluated
+  
+  
+  # plot setups
+  LWD = 2
+  ourcol=c('deepskyblue4', 'darkorange3', 'goldenrod', 'darkorchid4',
+           'darkolivegreen4', 'deepskyblue', 'red4', 'slateblue')
+  
+  net_str = net_structure(n-k+1, k) #extracts the levels and tuplets and individual splines for the number of splines n-k+1 of order k
+  n_level = max(net_str[, 2]) #the first column of 'net_str' is 1:(n-k+1), the second identifies the level index 
+                              #(top is the lowest level, bottom the highest, which opposite which we normally denoted in the paper), 
+                              #For periodic splines there is one more k-tuple at the end, which is not 
+                              #considered here. 
+  
+  
+  ma=max(y[,-1,drop=F]) #the largest value within the splines
+  
+  a=log(2)/ma #
+  c=rep(2*(n_level), length(x)) #all vallues will be within this circle
+  
+  #The highest level first
+  
+  
+  polar_plot(2*pi*x, c, lty= 3, ...) #maximal level circle for the outmost level 
+                                  #(the with initial splines in the basis)
+  for(i in 1:(n_level-1)){#maximal circles for the remaining levels (they will be also -infinity levels for one up levels)
+    c=rep(2*(n_level-i), length(x))
+    polar_lines(2*pi*x, c, lty= 3) 
+  }
+  
+  #The circles corresponding to zero level at each pyramid level
+  for(i in 1:(n_level)){#maximal circles for the remaining levels (they will be also -infinity levels for one up levels)
+    c=rep(2*(n_level-i)+1, length(x))
+    polar_lines(2*pi*x, c, lty= 3) 
+  }
+  
+  #Plotting the dashed lines at the knot locations
+  if(vknots==TRUE)
+  {
+    tt=2*pi*xi
+    for(i in 1:length(tt)){
+      polar_lines(c(tt[i],tt[i]),c(0,2*(n_level)),lty=3)
+    } 
+  }
+  
+  #Identification of the splines to be plot on each level
+  #Level one: 
+  for(l in 1:n_level){#Plotting on subsequent levels
+    seqID = sID[which(net_str[,2] == n_level-l+1)]
+  
+    if(length(seqID)>1){
+      for(j in seqID){
+        polar_lines(2*pi*x,(2*(n_level-l))+ exp(a* y[,(j+1)]), type = "l",  col = ourcol[j%%8+1])
+      }
+    }
+  }
+  
+  for(j in (n_so-k+2):(n_so+1)){
+    polar_lines(2*pi*x,exp(a* y[,j]), type = "l",  col = ourcol[j%%8+1])
+  }
+  # par(mfrow = c(1,1))
+  layout(matrix(1:1, 1, 1))
+}
+
+#####
+#----------------------------------------------------#
+#---- Sec 15 two main functions for fun_splinets ----#
+#----------------------------------------------------#
+
+# Function for generating B-splines and their orthogonalization
+#' @keywords internal
+
+# splinet1 was fun_splinet in Version 1 of Splinet package.
+
+splinet1 = function(knots=NULL, smorder = 3, type = 'spnt', Bsplines=NULL, norm=F){
+  
+  #------------------------------#
+  # S1: generating bspline basis #
+  #------------------------------#
+  if(!is.null(Bsplines)){ #inheriting the arguments if B-splines are in the input
+    knots=Bsplines@knots
+    smorder=k=Bsplines@smorder
+    n = length(knots) - 2
+    
+  }else{
+    k = smorder
+    n = length(knots) - 2
+    
+    #In the case knots are not in the increasing order they are sorted
+    if(min(diff(knots))<0){
+      knots=sort(unique(knots))
+      cat("Knots were not given in the strictly increasing order, which is required.\n
+          Ordered  knots with removed ties are replacing the input values.\n")
+    }
+    #
+    
+    #Creating a generic 'Splinets' object to store computed spline bases
+    so = new("Splinets", knots = knots, smorder = k) #it checks among other things if knots are equidistant
+    #and sets 'so@equid' to a proper value, see `setClass` in 
+    #'Splinets'-class defintion
+    so@type = "bs"
+    supp = cbind(1:(n-k+1),(1:(n-k+1))+k+1)
+    supp = so@supp = lapply(seq_len(nrow(supp)), function(i) supp[i,,drop=F]) #seq_len(n)=1:n, 
+    #creates a list of matrices not vectors
+    if(so@equid){
+      xi = knots[1:(k+2)] #so there will be only computations to get one element of the basis
+    } else{               #the remaining elements of the basis will have identical derivative matrices
+      xi = knots
+    }
+    n = length(xi)-2
+    
+    S = list()
+    S[[1]] = array(rep(1, n+1), dim = c((n+1), 1))
+    for(ord in 1:k){
+      S[[ord+1]] = array(0, dim = c((ord+1)*(n-ord+1), ord+1))
+      l1 = dim(S[[ord]])[1]; l2 = dim(S[[ord]])[2]
+      TS = array(rep(0, (l1+l1/ord)*l2), dim = c(l1+l1/ord, l2)) # temp augmented S matrix
+      TS[-(ord+1)*(1:(n-ord+2)), ] = S[[ord]]
+      TS1 = head(TS, -(ord+1)); TS2 = head(tail(TS, -ord),-1)
+      c1 = coeff1(xi, ord); c2 = coeff2(xi, ord)
+      lam1 = lambda1(xi, ord); lam2 = lambda2(xi, ord)
+      S[[ord+1]][,1] = c1*lam1*TS1[,1] + c2*lam2*TS2[,1]
+      S[[ord+1]][,ord+1] = c1*ord*TS1[,ord] + c2*ord*TS2[,ord]
+      if(ord>1){
+        for(j in 2:ord){
+          S[[ord+1]][,j] = c1*((j-1)*TS1[,j-1] + lam1*TS1[,j]) + c2*((j-1)*TS2[,j-1] + lam2*TS2[,j])
+        }
+      }
+    }
+    S = S[[k+1]]
+    # Transform to the symmetric representation of derivative matrices
+    SS = list()
+    n = length(knots)-2
+    if(so@equid){
+      for(i in 1:(n-k+1)){
+        SS[[i]] = sym2one(rbind(S, numeric(k+1)), supp[[i]], inv = T)
+      }
+    } else{
+      for(i in 1:(n-k+1)){
+        SS[[i]] = sym2one(rbind(S[(i+(i-1)*k):(i+i*k),], numeric(k+1)), supp[[i]], inv = T)
+      }
+    }
+    so@der = SS
+    n_so = length(SS)
+    Bsplines=so  #The Bsplines are computed 
+  } 
+  #=======================
+  #The end of the B-splines 
+  #------------------------------#
+  # S2: normalization of bspline basis #
+  #------------------------------#  
+  # normalization of the B-splines (one does not assume that the input splines are orthogonalized)
+  a = array(1/sqrt(gramian(Bsplines, norm_only = T)), dim=c((n-k+1),1))
+  so = Bsplines
+  for(i in 1:length(a)){
+    so@der[[i]] = a[i]*so@der[[i]]
+  }
+  if(norm==T){Bsplines=so} #Normalization of the output B-splines
+  splnt=list("bs"=Bsplines) #The B-spline part of the output list
+  n_so=length(so@der) #The number of osplines in the basis
+  #------------------------------#
+  # S3: Orthogonalization of B-splines #
+  #------------------------------#  
+  if(type == 'gsob'){
+    H = bandmatrix(knots, k, so@der, so@supp)
+    P = grscho(diag(n_so), H) #the generic algorithm for GS orthogonalization
+    so = lincomb(so, t(P))
+    so@type = 'gsob'
+    splnt$os=so
+  }
+  # S2.2: twosided obasis
+  if(type == 'twob'){
+    H = bandmatrix(knots, k, so@der, so@supp)
+    P = sgrscho(diag(n_so), H) #the generic algorithm for symmetric GS orthogonalization
+    so = lincomb(so, t(P))
+    so@type = 'twob'
+    splnt$os=so
+  }
+  # S2.3: splinet
+  if(type == 'spnt'){
+    
+    H=bandmatrix(knots,k,so@der,so@supp)
+    
+    P=dyadiag(H,k,so@equid) #The main band-matrix diagonalization algorithm
+    so = lincomb(so, t(P))
+    n=dim(H)[1] + k - 1
+    N=log2((n+1)/k)
+    if(N-floor(N)!=0){so@type = "spnt"}else{so@type = "dspnt"} #flagging if not dyadic
+    
+    splnt$os=so 
+  }
+  
+  return(splnt)
+}
+
+# Function for generating periodic B-splines and their orthogonalization
+
+#splinet2 function uses splinets1 function which was fun_splinet in version 1 of the package.
+
+splinet2 = function(knots, smorder = 3, type = 'spnt', Bsplines=NULL, norm=F){
+  #In the case knots are not in the increasing order they are sorted
+  if(!is.null(knots)){
+  if(min(diff(knots))<0){
+    knots=sort(unique(knots))
+    cat("Knots were not given in the strictly increasing order, which is required.\n
+          Ordered  knots with removed ties are replacing the input values.\n")
+  }
+  }
+  #
+  
+  if(!is.null(Bsplines)){ #inheriting the arguments if B-splines are in the input
+   # stopifnot(is(Bsplines,"Splinets"))
+    if(Bsplines@periodic!= TRUE){# no Splinets in the input thus knots have to be taken from the argument
+       stop("The B-splines in the input are not periodic, which is required in the periodic case.")}
+    else{
+    knots=Bsplines@knots
+    smorder=k=Bsplines@smorder
+    n = length(knots) - 2
+    Bsplines=Bsplines
+    Bspl=Bsplines
+    n_sop = length(Bsplines@supp)
+    lBspl=length(Bspl@der)
+    Bspl@supp=Bspl@supp[1:(lBspl-k)]
+    Bspl@der=Bspl@der[1:(lBspl-k)]
+    Bspl@periodic=FALSE
+    }
+  }else{
+    #------------------------------#
+    # S1: generating bspline basis #
+    #------------------------------#
+    k = smorder
+    n = length(knots) -2
+    sop = new("Splinets", knots = knots, smorder = k)
+    sop@type = "bs"
+    sop@periodic=TRUE
+    
+    #generating Bsplines over the given knots
+    Bspl=splinet1(knots, k, type = 'bs') 
+    Bspl=Bspl$bs
+    S=Bspl@der
+    supp=Bspl@supp
+    lBspl=length(S)
+    lM= dim(S[[1]])[1]
+    
+    #generating a small interval with 2k+1 knots
+    eknots=extraknots(knots,k )
+    
+    #generating the k extra splines to complete the set of periodic splines
+    espline=splinet1(eknots,k, type = 'bs' )
+    eS=espline$bs@der
+    esupp=espline$bs@supp
+    lespline=length(eS)
+    
+    #transferring the der matrices from symmetric to one sided
+    for (i in 1:k) {
+      eS[[i]]= sym2one(eS[[i]], esupp[[i]])
+      
+    }
+    
+    #changing support of the extra splines 
+    supp1 = cbind((lBspl+1):(lBspl+k),(n+2):(n+2))
+    supp1 = lapply(seq_len(lespline), function(i) supp1[i,,drop=F])
+    supp2 = cbind(1:1,2:(k+1))
+    supp2 = lapply(seq_len(lespline), function(i) supp2[i,,drop=F])
+    esupp = lapply(seq_len(lespline), function(i) rbind(supp2[[i]],supp1[[i]]))
+    
+    
+    ####changing der matrix of the extra splines
+    
+    Mder1=lapply(seq_len(k), function(i) eS[[(i)]][(1):(lM-i),,drop=F])
+    Mder2=lapply(seq_len(k), function(i) eS[[(i)]][(lM-i):(lM),,drop=F])
+    
+    # In this step we changed the last row in Mder1 to zeros and transferring
+    #the der matrices from one sided to symmetric
+    for (i in 1:k) { 
+      D=dim(Mder1[[i]])
+      Mder1[[i]][D[1],]=0 
+      Mder1[[i]]=sym2one(Mder1[[i]],supp1[[i]],inv=T)
+    }
+    
+    for (i in 1:k) { 
+      D=dim(Mder2[[i]])
+      Mder2[[i]]=sym2one(Mder2[[i]],supp2[[i]],inv=T)
+    }
+    
+    
+    Mder= lapply(seq_len(lespline), function(i) rbind(Mder2[[i]],Mder1[[i]]))
+    
+    for (i in 1:k) { ## extra k splines that have the end points (the first and the last points of the iterval connected)
+      ##in its support
+      S[[lBspl+i]]=Mder[[i]]
+      supp[[lBspl+i]]=esupp[[i]]
+    }
+    
+    
+    
+    sop@der = S
+    sop@supp=supp
+    n_sop = length(S)
+    Bsplines=sop
+  } #The end of generation of the periodic B-splines if they are not in the input
+  #------------------------------#
+  # S2: normalization of bspline basis #
+  #------------------------------#  
+  # normalization of the B-splines (one does not assume that the input splines are orthogonalized)
+  a = array(1/sqrt(gramian(Bsplines, norm_only = T)), dim=c((n+1),1))
+  so = Bsplines
+  for(i in 1:length(a)){
+    so@der[[i]] = a[i]*so@der[[i]]
+  }
+  if(norm==T){Bsplines=so} #Normalization of the output B-splines
+  splnt=list("bs"=Bsplines) #The B-spline part of the output list
+  n_so=length(so@der) #The number of osplines in the basis
+  #------------------------------#
+  # S3: Orthogonalization of B-splines #
+  #------------------------------#  
+  # S3.1: gram schmidt obasis
+  if(type == 'gsob'){
+    H = bandmatrix(knots, k, so@der, so@supp)
+    P = grscho(diag(n_so), H) #the generic algorithm for GS orthogonalization
+    so = lincomb(so, t(P))
+    so@type = 'gsob'
+    splnt$os=so
+  }
+  
+  # S3.2: twosided obasis
+  if(type == 'twob'){
+    two= splinet1(knots, k, Bsplines=Bspl,norm = T, type = 'twob')
+    n_two=length(two$bs@der)
+    ctwo= so
+    for (j in 1:n_two) {
+      ctwo@der[[j]]= two$os@der[[j]]
+      ctwo@supp[[j]]= two$os@supp[[j]]
+    }
+    gram=gramian(ctwo, norm_only = F)
+    # matrix with negative inner products
+    A= -1*(gram-diag(diag(gram),nrow=(n_two+k))) + diag(diag(gram),nrow=(n_two+k))
+    lA=dim(A)[1]
+    A=A[(lA-k+1):lA,]
+    
+    d=dim(A)[2]
+    
+    for (i in 1:k) {
+      for (j in (d-k+1):d) {
+        if (!(j-i)==(d-k)) { A[i,j]=0}
+      }
+    }
+    
+    s = lincomb(ctwo,A)
+    H=gramian(s)
+    P = dyadicsplinet(A = diag(k), H = H, k = k)
+    # generate the splinet os
+    ss = lincomb(s, t(P))
+    
+    if (length(ss@supp)>0) {
+      for (j in 1:k) {
+       ctwo@der[[n_two+j]]= ss@der[[j]]
+       ctwo@supp[[n_two+j]]= ss@supp[[j]]
+      }
+    }else{
+      for (j in 1:k) {
+        ctwo@der[[n_two+j]]= ss@der[[j]]
+        ctwo@supp[[n_two+j]]= matrix(c(1,(n+2)),nrow=1)
+      }
+    }
+    ctwo@type = 'twob'
+    splnt$os=ctwo
+  }
+  
+  
+  # S2.3: splinet
+  if(type == 'spnt'){
+    #generating the original splinets  over the given knots
+    net_splinet=splinet1(knots, k, Bsplines=Bspl,norm = T, type = 'spnt')
+    n_os=length(net_splinet$os@der)
+    
+   
+    # # choosing the first and the last tuplet at each level.
+    M=net_splinet$os
+    net_str = net_structure(n-k+1, k)
+    n_level = max(net_str[, 2])
+    
+    
+    M_net=list()
+    M_supp=list()
+    s=1
+    seqID = net_str[which(net_str[,2] == 1),1 ]
+    for (j in seqID) {
+      M_net[[s]]= net_splinet$os@der[[j]]
+      M_supp[[s]]= net_splinet$os@supp[[j]]
+      s=s+1
+    }
+    
+    for(i in 2:n_level) {
+      mmax=max(net_str[which(net_str[,2] == i),3])
+      mmin=min(net_str[which(net_str[,2] == i),3])
+      for (j in c(mmin,mmax))
+      {
+        seqID=net_str[net_str[,2] == i & net_str[,3]==j, 1]
+        for (l in seqID)
+        {
+          M_net[[s]]= net_splinet$os@der[[l]]
+          M_supp[[s]]= net_splinet$os@supp[[l]]
+          s=s+1
+        }
+      }
+    }
+    
+    # adding the extra splines that need to be orthogonalized with respect to
+    # the first and the last tuplet at each level.
+    
+    lM_net=length(M_net)
+    for (i in 1:k) {
+      M_net[[lM_net+i]]= so@der[[n_sop-k+i]]
+      M_supp[[lM_net+i]]= so@supp[[n_sop-k+i]]
+    }
+    
+    
+    M@supp=M_supp
+    M@der=M_net
+    M@type='sp'
+    gram=gramian(M, norm_only = F)
+    
+    
+    # matrix with negative inner products
+    A= -1*(gram-diag(diag(gram),nrow=(lM_net+k))) + diag(diag(gram),nrow=(lM_net+k))
+    lA=dim(A)[1]
+    A=A[(lA-k+1):lA,]
+    
+    d=dim(A)[2]
+    
+    for (i in 1:k) {
+      for (j in (d-k+1):d) {
+        if (!(j-i)==(d-k)) { A[i,j]=0}
+      }
+    }
+    
+    s = lincomb(M,A)
+    H=gramian(s)
+    P = dyadicsplinet(A = diag(k), H = H, k = k)
+    # generate the splinet os
+    ss = lincomb(s, t(P))
+    
+    
+    
+    
+    
+    if (length(ss@supp)>0) {
+      for (j in 1:k) {
+        net_splinet$os@der[[n_os+j]]= ss@der[[j]]
+        net_splinet$os@supp[[n_os+j]]= ss@supp[[j]]
+      }
+    }
+      else
+      {
+        for (j in 1:k) {
+          net_splinet$os@der[[n_os+j]]= ss@der[[j]]
+          net_splinet$os@supp[[n_os+j]]= matrix(c(1,(n+2)),nrow=1)
+        }
+      }
+  
+    splnt$os=net_splinet$os
+    splnt$os@periodic=TRUE
+    res=aug_bound(n_so,k)
+    
+    
+    if(res$n_U == 0 & res$n_D == 0){
+      splnt$os@type = "dspn"
+    }else{
+      splnt$os@type = "spnt"
+    }
+  }
+  return(splnt)
+}
+

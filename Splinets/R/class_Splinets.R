@@ -32,6 +32,7 @@
 #'   \item \code{dspnt} for a fully dyadic splinet,
 #'   \item \code{spnt} for a non-dyadic splinet.
 #' }  
+#' @slot periodic logical, indicates if the B-splines are periodic or not.
 #' @slot epsilon numeric (positive), an accuracy used to detect a problem with the conditions
 #' required for the matrix of the derivatives (controls relative deviation from the conditions);
 #'
@@ -39,10 +40,13 @@
 #' values for the fields.
 #' @export
 #' @section References:
-#' Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2019) "Splinets -- efficient orthonormalization of the B-splines."  <arXiv:1910.07341>.
+#' Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. "Dyadic diagonalization of positive definite band matrices and efficient B-spline orthogonalization." Journal of Computational and Applied Mathematics (2022) <https://doi.org/10.1016/j.cam.2022.114444>.
+#' 
 #'
 #' Podg\eqn{\mbox{\'o}}{o}rski, K. (2021) 
 #' "\code{Splinets} -- splines through the Taylor expansion, their support sets and orthogonal bases." <arXiv:2102.00733>.
+#' 
+#'  Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2023) "Splinets 1.5.0 -- Periodic Splinets." <arXiv:2302.07552>
 #' 
 #' @seealso \code{\link{is.splinets}} for evaluation of a \code{Splinets}-object; \code{\link{construct}} for constructing a \code{Splinets}-object; 
 #' \code{\link{plot,Splinets-method}} for plotting methods for \code{Splinets}-objects;
@@ -53,10 +57,10 @@
 setClass("Splinets",
          representation(
            knots="vector", smorder="numeric", equid="logical",
-           supp="list", der="list", taylor = "matrix",type = "character", epsilon="numeric"
+           supp="list", der="list", taylor = "matrix",type = "character", periodic="logical", epsilon="numeric"
          ),
          prototype(
-           knots=c(0,1), smorder=0, equid=FALSE, der=list(as.matrix(c(1,1))), type="sp", epsilon=0.0000001
+           knots=c(0,1), smorder=0, equid=FALSE, der=list(as.matrix(c(1,1))), type="sp", periodic=FALSE, epsilon=0.0000001
            )
          #prototype sets the initial values for slots, if desired 
 )

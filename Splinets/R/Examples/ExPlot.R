@@ -18,7 +18,7 @@ nspl=construct(xi,k,SS3,supp[[3]],'CRLC')
 spl=gather(spl,nspl) #the third is added
 
 plot(spl)
-plot(spl,sID=c(1,3))
+  plot(spl,sID=c(1,3))
 plot(spl,sID=2)
 t = seq(0,0.5,length.out = 1000)
 plot(spl, t, sID = 1)
@@ -32,4 +32,15 @@ plot(spl,main="Mean Spline",lty=2,lwd=2,xlab='')
 RS=rspline(spl,5)
 plot(RS,main="Random splines around the mean spline",ylim=3*range(spl@der[[1]][,1]) )
 lines(spl,col='red',lwd=4,lty=2)
+
+#Periodic splines
+xi = seq(0, 1, length.out = 25)
+so = splinet(xi, periodic = TRUE) 
+
+plot(so$bs)
+plot(so$os)
+plot(so$bs,type= "dyadic")
+plot(so$bs, sID=c(4,6))
+plot(so$os, type="simple",sID=c(4,6))
+
 

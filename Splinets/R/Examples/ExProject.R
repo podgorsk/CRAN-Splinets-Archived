@@ -1,9 +1,8 @@
 #-------------------------------------------------#
 #----Representing splines in the spline bases-----#
 #-------------------------------------------------#
-\donttest{
 k=3 # order
-n = 16 # number of the internal knots (excluding the endpoints)
+n = 10 # number of the internal knots (excluding the endpoints)
 xi = seq(0, 1, length.out = n+2)
 set.seed(5)
 S=matrix(rnorm((n+2)*(k+1)),ncol=(k+1))
@@ -11,11 +10,17 @@ S=matrix(rnorm((n+2)*(k+1)),ncol=(k+1))
 spl=construct(xi,k,S) 
 
 plot(spl) # plotting a spline
-spls=rspline(spl,10) # a random sample of splines
+spls=rspline(spl,5) # a random sample of splines
 
 Repr=project(spl) #decomposition of splines into the splinet coefficients
 
-plot(Repr$basis) #the plot of the splinet used for decomposition
+Repr=project(spl, graph = TRUE) #decomposition of splines with the following graphs
+                             #that illustrate the decomposition: 
+                             # 1) The orthogonal spine basis on the dyadic grid; 
+                             # 2) The coefficients of the projections on the dyadic grid;
+                             # 3) The input splines;
+                             # 4) The projections of the input.
+                
 Repr$coeff       #the coefficients of the decomposition
 plot(Repr$sp) #plot of the reconstruction of the spline
 
@@ -25,8 +30,6 @@ plot(Reprs$sp)
 
 Reprs2=project(spls,type = 'gsob') #using the Gram-Schmidt basis
 
-plot(Reprs2$basis)
-plot(Reprs2$sp) 
 
 #The case of the regular non-normalized B-splines:
 Reprs3=project(spls,type = 'bs') 
@@ -39,13 +42,13 @@ plot(Reprs3$basis) #Bsplines
 plot(Reprs3$sp) #reconstruction using the B-splines and the decomposition
 
 #a non-equidistant example
-n=17; k=4
+n=10; k=3
 set.seed(5)
 xi=sort(runif(n+2)); xi[1]=0; xi[n+2]=1 
 S=matrix(rnorm((n+2)*(k+1)),ncol=(k+1))
 spl=construct(xi,k,S) 
 plot(spl)
-spls=rspline(spl,20) # a random sample of splines
+spls=rspline(spl,5) # a random sample of splines
 plot(spls)
 Reprs=project(spls,type = 'twob') #decomposing using the two-sided orthogonalization
 plot(Reprs$basis)
@@ -58,7 +61,6 @@ plot(Reprs2$sp) #reconstruction using the B-splines and the decomposition
 #-------------------------------------------------#
 #-----Projecting splines into a spline space------#
 #-------------------------------------------------#
-
 k=3 # order
 n = 10 # number of the internal knots (excluding the endpoints)
 xi = seq(0, 1, length.out = n+2)
@@ -85,7 +87,7 @@ Res=lincomb(All,matrix(c(1,-1),ncol=2))
 plot(Res)
 gramian(Res,Sp2 = Rbasis) #the zero valued innerproducts -- the orthogonality of the residual spline
 
-spls=rspline(spl,10) # a random sample of splines
+spls=rspline(spl,5) # a random sample of splines
 Prspls=project(spls,knots,type='bs') #projection in the B-spline representation
 plot(spls)
 lines(Prspls$sp) #presenting projections on the common plot with the original splines
@@ -114,14 +116,14 @@ Prspl$sp@supp
 
 #Using explicit bases 
 
-k=5 # order
-n = 40 # number of the internal knots (excluding the endpoints)
+k=3 # order
+n = 10 # number of the internal knots (excluding the endpoints)
 xi = seq(0, 1, length.out = n+2)
 set.seed(5)
 S=matrix(rnorm((n+2)*(k+1)),ncol=(k+1))
 
 spl=construct(xi,k,S) 
-spls=rspline(spl,20) # a random sample of splines
+spls=rspline(spl,5) # a random sample of splines
 
 plot(spls)
 
@@ -136,13 +138,12 @@ lines(spls)
 #------------------------------------------------------#
 #---Projecting discretized data into a spline space----#
 #------------------------------------------------------#
-
-k=4; n = 30; xi = seq(0, 1, length.out = n+2)
+k=3; n = 10; xi = seq(0, 1, length.out = n+2)
 set.seed(5)
 S=matrix(rnorm((n+2)*(k+1)),ncol=(k+1))
 spl=construct(xi,k,S); spls=rspline(spl,10) # a random sample of splines
 
-x=runif(80)
+x=runif(50)
 FData=evspline(spls,x=x) #discrete functional data
 
 matplot(FData[,1],FData[,-1],pch='.',cex=3)
@@ -153,7 +154,7 @@ FData[,-1]=FData[,-1]+noise
 
 matplot(FData[,1],FData[,-1],pch='.',cex=3)
 
-knots=runif(14) 
+knots=runif(12) 
 
 DatProj=project(FData,knots)
 
@@ -191,9 +192,6 @@ matplot(FData[,1],FData[,-1],pch='.',cex=3)
 lines(DatProj4$sp) 
 lines(spls) #overlying the functions that the original data were built from
 
-plot(DatProj3$basis) #the 3rd order
-plot(DatProj4$basis) #the 4th order
-
 #Using two-sided orthonormal basis
 
 DatProj5=project(FData,knots,type='twob')
@@ -201,40 +199,66 @@ matplot(FData[,1],FData[,-1],pch='.',cex=3)
 lines(DatProj5$sp)
 lines(spls)
 
-plot(DatProj5$basis) #two-sided orthonormal spline basis
+#--------------------------------------------------#
+#-----Projecting into a periodic spline space------#
+#--------------------------------------------------#
+#generating periodic splines
+n=1# number of samples
+k=3
+N=3
+
+n_knots=2^N*k-1 #the number of internal knots for the dyadic case
+xi = seq(0, 1, length.out = n_knots+2)
+
+so = splinet(xi,smorder = k, periodic = TRUE) #The splinet basis
+stwo = splinet(xi,smorder = k,type='twob', periodic = TRUE) #The two-sided orthogonal basis
+
+plot(so$bs,type='dyadic',main='B-Splines on dyadic structure') #B-splines on the dyadic graph 
+
+plot(stwo$os,main='Symmetric OB-Splines') #The two-sided orthogonal basis 
+
+plot(stwo$os,type='dyadic',main='Symmetric OB-Splines on dyadic structure')
+
+# generating a periodic spline as a linear combination of the periodic splines 
+A1= as.matrix(c(1,0,0,0.7,0,0,0,0.8,0,0,0,0.4,0,0,0, 1, 0,0,0,0,0,1,0, .5),nrow= 1)
+circular_spline=lincomb(so$os,t(A1))
+
+plot(circular_spline)
+
+#Graphical visualizations of the projections 
+
+Pro_spline=project(circular_spline,basis = so$os,graph = TRUE)
+plot(Pro_spline$sp)
+
+#---------------------------------------------------------------#
+#---Projecting discretized data into a periodic spline space----#
+#---------------------------------------------------------------#
+nx=100 # number of discritization 
+n=1# number of samples
+k=3
+N=3
+
+n_knots=2^N*k-1 #the number of internal knots for the dyadic case
+xi = seq(0, 1, length.out = n_knots+2)
+
+so = splinet(xi,smorder = k, periodic = TRUE)
+
+hf=1/nx 
+grid=seq (hf , 1, by=hf) #grid 
+l=length(grid)
+BB = evspline(so$os, x =grid)
+fbases=matrix(c(BB[,2],BB[,5],BB[,9],BB[,13],BB[,17], BB[,23], BB[,25]), nrow = nx)
+
+#constructing periodic data 
+f_circular=matrix(0,ncol=n+1,nrow=nx)
+lambda=c(1,0.7,0.8,0.4, 1,1,.5)
+f_circular[,1]= BB[,1]
+f_circular[,2]= fbases%*%lambda
+
+plot(f_circular[,1], f_circular[,2], type='l')
+
+Pro=project(f_circular,basis = so$os) 
+plot(Pro$sp)
 
 
-#-------------------------------------------------#
-#---------Simple functional data analysis---------#
-#-------------------------------------------------#
 
-matplot(truck[,1],truck[,2:dim(truck)[2]],type='l',lty=1)
-
-knots=seq(-100,100, by=1)
-TruckProj=project(as.matrix(truck),knots)
-
-MeanTruck=matrix(colMeans(TruckProj$coeff),ncol=dim(TruckProj$coeff)[2])
-MeanTruckSp=lincomb(TruckProj$basis,MeanTruck)
-
-plot(MeanTruckSp) #the mean spline of the projections
-
-plot(TruckProj$sp,sID=1:10) #the first ten projections of the functional data
-
-Sigma=cov(TruckProj$coeff)
-Spect=eigen(Sigma,symmetric = TRUE)
-
-plot(Spect$values, type ='l',col='blue', lwd=4 ) #the eigenvalues
-
-EigenTruckSp=lincomb(TruckProj$basis,t(Spect$vec))
-plot(EigenTruckSp,sID=1:5) #the first five largest eigenfunctions
-
-#-------------------------------------------------#
-#------------Graphical features ------------------#
-#-------------------------------------------------#
-
-project(FData,knots, graph = TRUE) #the splinet projection
-
-project(FData,basis = bases$bs,graph = TRUE) #B-spline projection
-
-project(FData,knots,type='twob',graph = TRUE) #two-sided projection
-}

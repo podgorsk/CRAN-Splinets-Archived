@@ -12,7 +12,7 @@ lincomb(object, A, reduced = TRUE, SuppExtr = TRUE)
 \item{A}{\code{l x d} matrix; coefficients of the linear transformation,}
 
 \item{reduced}{logical; If \code{TRUE} (default), then the linear combination is 
-calculated accounting the actual support sets (recommended for sparse splines), 
+calculated accounting for the actual support sets (recommended for sparse splines), 
 if \code{FALSE}, then the 
 full support computations are used (can be faster for lower dimension or non-sparse cases).}
 
@@ -30,10 +30,13 @@ and returned as a \code{Splinet}-object.
 }
 \section{References}{
 
-Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2019) "Splinets -- efficient orthonormalization of the B-splines."  <arXiv:1910.07341>.
+Liu, X., Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. "Dyadic diagonalization of positive definite band matrices and efficient B-spline orthogonalization." Journal of Computational and Applied Mathematics (2022) <https://doi.org/10.1016/j.cam.2022.114444>.
+
 
 Podg\eqn{\mbox{\'o}}{o}rski, K. (2021) 
 "\code{Splinets} -- splines through the Taylor expansion, their support sets and orthogonal bases." <arXiv:2102.00733>.
+
+ Nassar, H., Podg\eqn{\mbox{\'o}}{o}rski, K. (2023) "Splinets 1.5.0 -- Periodic Splinets." <arXiv:2302.07552>
 }
 
 \examples{

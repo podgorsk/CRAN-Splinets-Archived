@@ -4,8 +4,6 @@
 #' @param x \code{Splinets} object;
 #' @param sID vector, specifying indices of splines in the splinet object to be plotted;
 #' @param ... other standard graphical parameters;
-#' @return No return values, the effect are lines (graphs) visualizing a Splinet object added to the current plot. 
-#' The entire set of splines is displayed in the plot. 
 #' @export
 #' @inheritSection Splinets-class References
 #' 
